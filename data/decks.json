@@ -1,0 +1,24 @@
+{
+  "decks": [
+    {
+      "id": "general_knowledge",
+      "name": "General Knowledge",
+      "file": "./data/general_knowledge.txt"
+    },
+    {
+      "id": "bangla",
+      "name": "Bangla",
+      "file": "./data/bangla.txt"
+    },
+    {
+      "id": "english_vocab",
+      "name": "English Vocabulary",
+      "file": "./data/english_vocab.txt"
+    },
+    {
+      "id": "science",
+      "name": "Science",
+      "file": "./data/science.txt"
+    }
+  ]
+}

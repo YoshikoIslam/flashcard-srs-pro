@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Flashcard Pro - TXT Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding-top: 15px;
+            color: #444;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            text-align: center;
+            width: 90%;
+            max-width: 800px;
+            animation: fadeIn 0.5s ease-out;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { color: #2c3e50; margin-top: 0; margin-bottom: 15px; font-size: 2em; }
+
+        /* Setup Page Styles */
+        .settings-panel {
+            background-color: #f9fafc;
+            border: 1px solid #d0dbe5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .setting-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #dde4ec;
+        }
+        .setting-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+        .setting-label { font-weight: 600; color: #34495e; }
+
+        input[type="number"], input[type="file"], select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #bdc3c7;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95em;
+            background-color: white;
+            color: #2c3e50;
+            box-sizing: border-box;
+        }
+        
+        #start-learning-btn {
+            background-color: #27ae60;
+            color: white;
+            font-size: 1.2em;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(39, 174, 96, 0.2);
+        }
+        #start-learning-btn:hover:not(:disabled) { background-color: #219653; transform: translateY(-2px); }
+        #start-learning-btn:disabled { background-color: #bdc3c7; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Player Page Styles */
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        #back-btn {
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        #back-btn:hover { background-color: #bdc3c7; color: #2c3e50; }
+
+        #delete-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        #delete-btn:hover { background-color: #c0392b; transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+        .status-board {
+            font-size: 1.1em;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            color: #34495e;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px;
+            background-color: #eaf1f8;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        #due-count, #total-due, #total-count { 
+            color: #e74c3c; 
+        }
+
+        .mobile-label { display: none; }
+        .desktop-label { display: inline; }
+
+        #flashcard-canvas {
+            background-color: #fdfdfd;
+            border: 1px solid #dde4ec;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .controls, .feedback-btns {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* Shared Button Styles */
+        .controls button, .feedback-btns button {
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 500;
+            margin: 6px;
+            min-width: 120px;
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .controls button:hover, .feedback-btns button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Hierarchy Groups */
+        .primary-group {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+
+        .secondary-group {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            border-top: 1px dashed #dde4ec;
+            padding-top: 15px;
+            margin-top: 5px;
+        }
+
+        /* Standard Controls Color Overrides (Only color!) */
+        #show-answer-btn, #export-btn, #add-gk-btn { 
+            background-color: #34495e; 
+            color: #fff;
+            min-width: 150px; 
+        }
+        #edit-gk-btn { background-color: #16a085; color: #fff; min-width: 90px; }
+        #load-more-btn { background-color: #8e44ad; display: none;} 
+
+        /* SRS Feedback Colors */
+        .btn-again { background-color: #e74c3c; } 
+        .btn-good { background-color: #27ae60; }  
+
+        #message-area {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        .info-message { color: #2980b9; background-color: #eaf6ff; border: 1px solid #c2dcf2; }
+        .success-message { color: #27ae60; background-color: #e9f7ef; border: 1px solid #d4efdf; }
+        .error-message { color: #e74c3c; background-color: #fdedf0; border: 1px solid #fadbd8; }
+
+        /* Reusable Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: left;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .modal-content textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #bdc3c7;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95em;
+            resize: vertical;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .modal-content textarea:focus {
+            border-color: #3498db;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            color: white;
+        }
+
+        #btn-modal-save { background-color: #27ae60; }
+        #btn-modal-cancel { background-color: #95a5a6; }
+
+        /* --- RESPONSIVE DESIGN ADDITIONS --- */
+        input[type="file"] { width: 100%; }
+        input[type="number"], select { max-width: 100%; }
+        
+        @media (max-width: 768px) {
+            .container { padding: 20px; width: 95%; }
+            .status-board { font-size: 1em; padding: 10px; }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 12px 14px; }
+            h1 { font-size: 1.5em; margin-bottom: 10px; }
+            .status-board { font-size: 0.85em; padding: 8px; gap: 5px; justify-content: space-between; margin-bottom: 10px; }
+            .desktop-label { display: none; }
+            .mobile-label { display: inline; }
+            #back-btn, #delete-btn { padding: 6px 12px; font-size: 0.9em; }
+            .controls button, .feedback-btns button { min-width: 45%; margin: 4px; padding: 8px 10px; font-size: 0.85em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div id="setup-page">
+            <h1>Smart Flashcard Pro</h1>
+            
+            <div class="settings-panel">
+                <div class="setting-group">
+                    <span class="setting-label">1. Load Text Database (.txt):</span>
+                    <input type="file" id="file-input" accept=".txt">
+                </div>
+
+                <div class="setting-group">
+                    <span class="setting-label">2. Hard Words Limits:</span>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="text-align: center;">
+                            <label style="display:block; font-size:0.8em; color:#7f8c8d;">Count (Level < 2)</label>
+                            <input type="number" id="hard-words-count" value="20" min="5" max="200" style="width: 70px;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <span class="setting-label">3. Winning Streak (Level 0):</span>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="text-align: center;">
+                            <label style="display:block; font-size:0.8em; color:#7f8c8d;">Pass Target</label>
+                            <input type="number" id="streak-threshold" value="2" min="1" max="10" style="width: 70px;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <span class="setting-label">4. Export Specific Score Cards:</span>
+                    <div style="display: flex; gap: 10px; align-items: flex-end;">
+                        <div>
+                            <label style="display:block; font-size:0.8em; color:#7f8c8d;">Score Below (<)</label>
+                            <input type="number" id="export-max-score" value="0" style="width: 70px;">
+                        </div>
+                        <button id="export-low-score-btn" style="background-color: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; height: 38px;">Export .txt</button>
+                    </div>
+                </div>
+            </div>
+
+            <button id="start-learning-btn" disabled>Upload Database to Start 🚀</button>
+            <div id="message-area" class="info-message">Upload your .txt file (Format: Qstn &gt; Ans &gt; Lvl &gt; Score).</div>
+        </div>
+
+        <div id="player-page" style="display: none;">
+            
+            <div class="header-bar">
+                <button id="back-btn">⬅ Settings</button>
+                <button id="delete-btn" style="display: none;" title="Permanently delete this card">Delete 🗑️</button>
+            </div>
+            
+            <div class="status-board">
+                <div>
+                    <span class="desktop-label">Session Queue:</span>
+                    <span class="mobile-label">Q:</span>
+                    <span id="due-count">0</span>
+                </div>
+                <div>
+                    <span class="desktop-label">Total Due Today:</span>
+                    <span class="mobile-label">Due:</span>
+                    <span id="total-due">0</span>
+                </div>
+                <div>
+                    <span class="desktop-label">Total DB:</span>
+                    <span class="mobile-label">DB:</span>
+                    <span id="total-count">0</span>
+                </div>
+            </div>
+
+            <canvas id="flashcard-canvas" width="700" height="350"></canvas>
+
+            <div class="controls" id="main-controls" style="display: none;">
+                <button id="show-answer-btn">Show Answer 👀</button>
+                <button id="add-gk-btn">Add GK ➕</button>
+                <button id="export-btn">Save Progress 💾</button>
+                <button id="load-more-btn">Load Next Chunk 🔄</button>
+            </div>
+
+            <div id="feedback-btns-2" class="feedback-btns" style="display: none;">
+                <button id="btn-fail" class="btn-again">Fail <br></button>
+                <button id="edit-gk-btn">Edit ✏️</button>
+                <button id="btn-pass" class="btn-good">Pass <br></button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="gk-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Add / Edit GK</h3>
+            <textarea id="modal-input" placeholder="Question > Answer (Example: দক্ষিণ আমেরিকার সবচেয়ে উত্তরের দেশ কোনটি > কলম্বো)"></textarea>
+            <div class="modal-actions">
+                <button id="btn-modal-cancel">Cancel</button>
+                <button id="btn-modal-save">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Helper function for local date
+			function getLocalDate(dateObj = new Date()) {
+				return dateObj.getFullYear() + "-" + 
+					   String(dateObj.getMonth() + 1).padStart(2, '0') + "-" + 
+					   String(dateObj.getDate()).padStart(2, '0');
+			}
+            // --- State Variables ---
+            let flashcards = [];       
+            let dueQueue = [];         
+            let currentItem = null;    
+            let isAnswerVisible = false;
+            let currentDeckName = 'flashcards_database.txt';
+            let recentCardTracker = []; 
+            let hasUnsavedChanges = false; 
+            
+            let modalMode = 'add'; // 'add' or 'edit'
+
+            // --- DOM Elements ---
+            const setupPage = document.getElementById('setup-page');
+            const fileInput = document.getElementById('file-input');
+            const startLearningBtn = document.getElementById('start-learning-btn');
+            const messageArea = document.getElementById('message-area');
+
+            const playerPage = document.getElementById('player-page');
+            const backBtn = document.getElementById('back-btn');
+            const deleteBtn = document.getElementById('delete-btn');
+            const canvas = document.getElementById('flashcard-canvas');
+            const ctx = canvas.getContext('2d');
+            const showAnswerBtn = document.getElementById('show-answer-btn');
+            
+            const addGkBtn = document.getElementById('add-gk-btn');
+            const editGkBtn = document.getElementById('edit-gk-btn');
+            
+            const loadMoreBtn = document.getElementById('load-more-btn');
+            const mainControls = document.getElementById('main-controls');
+            const feedbackBtns2 = document.getElementById('feedback-btns-2');
+            
+            // Modal Elements
+            const gkModal = document.getElementById('gk-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalInput = document.getElementById('modal-input');
+            const btnModalSave = document.getElementById('btn-modal-save');
+            const btnModalCancel = document.getElementById('btn-modal-cancel');
+
+            // --- Canvas Config ---
+            const FONT_PRIMARY = "bold 26px Poppins";
+            const FONT_SECONDARY = "500 20px Poppins";
+            const COLOR_Q = "#2c3e50";
+            const COLOR_A = "#27ae60";
+            const COLOR_HINT = "#7f8c8d";
+
+            // Tab Close Warning
+            window.addEventListener('beforeunload', (e) => {
+                if (hasUnsavedChanges) {
+                    e.preventDefault();
+                    e.returnValue = 'You have unsaved progress! Please click Save Progress before leaving.';
+                }
+            });
+
+            // --- 1. Load & Parse TXT dynamically ---
+            fileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    currentDeckName = file.name;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const lines = e.target.result.split('\n');
+                            flashcards = [];
+                            
+                            const todayStr = getLocalDate();
+
+                            lines.forEach((line) => {
+                                const trimmed = line.trim();
+                                if (!trimmed) return; // Skip empty lines
+
+                                // Split by ' > ' and parse (Original Logic Preserved)
+                                const parts = trimmed.split(/\s*>\s*/);
+                                
+                                if (parts.length >= 2) {
+                                    const question = parts[0];
+                                    const answer = parts[1];
+                                    // Parse Level, default to 0 if missing or not a number
+                                    const level = (parts.length > 2 && !isNaN(parseInt(parts[2]))) ? parseInt(parts[2]) : 0;
+                                    // Parse Score, default to 0 if missing or not a number
+									const score = (parts.length > 3 && !isNaN(parseInt(parts[3]))) ? parseInt(parts[3]) : 0;
+
+									// নতুন লাইন: ৫ নম্বর অংশ থেকে তারিখটি বের করা, না থাকলে আজকের তারিখ নেওয়া
+									const reviewDate = (parts.length > 4 && parts[4].trim() !== "") ? parts[4].trim() : todayStr;
+
+									flashcards.push({
+										question: question,
+										answer: answer,
+										level: level,
+										score: score,
+										next_review: reviewDate 
+									});
+                                }
+                            });
+
+                            updateMessage(`Success! Loaded ${flashcards.length} cards. Ready to Start.`, 'success-message');
+                            startLearningBtn.disabled = false;
+                            startLearningBtn.textContent = "Start Learning 🚀";
+                            hasUnsavedChanges = false;
+                        } catch (err) {
+                            updateMessage(`Error loading file: ${err.message}`, 'error-message');
+                            startLearningBtn.disabled = true;
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            });
+
+            // --- PAGE NAVIGATION LOGIC ---
+            startLearningBtn.addEventListener('click', () => {
+                buildDueQueue();
+                setupPage.style.display = 'none';
+                playerPage.style.display = 'block';
+                drawFlashcard();
+            });
+
+            backBtn.addEventListener('click', () => {
+                playerPage.style.display = 'none';
+                setupPage.style.display = 'block';
+            });
+
+            // --- SINGLE REUSABLE MODAL PARSER ---
+            function parseModalText(text) {
+                if (!text || !text.trim()) return null;
+                const parts = text.split(/\s*>\s*/);
+                
+                if (parts.length < 2) return null;
+
+                const q = parts[0].trim();
+                // Join back everything else to support > inside the answer
+                const a = parts.slice(1).join(' > ').trim(); 
+
+                if (!q || !a) return null; // Empty check validation
+
+                return { question: q, answer: a };
+            }
+
+            // --- Add/Edit Button Modals ---
+            function openModal(mode, text = '') {
+                modalMode = mode;
+                modalTitle.textContent = mode === 'add' ? 'Add New GK ➕' : 'Edit GK ✏️';
+                modalInput.value = text;
+                gkModal.style.display = 'flex';
+                modalInput.focus();
+                
+                // Hide card while editing for UX focus
+                if(mode === 'edit') {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            addGkBtn.addEventListener('click', () => {
+                openModal('add');
+            });
+
+            editGkBtn.addEventListener('click', () => {
+                if (!currentItem) return;
+                openModal('edit', `${currentItem.question} > ${currentItem.answer}`);
+            });
+
+            btnModalCancel.addEventListener('click', () => {
+                gkModal.style.display = 'none';
+                if(modalMode === 'edit') drawFlashcard(); // redraw if cancelled
+            });
+
+            btnModalSave.addEventListener('click', () => {
+                const parsedData = parseModalText(modalInput.value);
+                
+                if (!parsedData) {
+                    alert("ভুল ফরম্যাট অথবা খালি ইনপুট! অবশ্যই 'Question > Answer' ফরম্যাটে দিন।");
+                    return;
+                }
+
+                if (modalMode === 'add') {
+                    const todayStr = getLocalDate();
+                    const newCard = {
+                        question: parsedData.question,
+                        answer: parsedData.answer,
+                        level: 0,
+                        score: 0,
+                        next_review: todayStr
+                    };
+
+                    flashcards.push(newCard);
+                    dueQueue.push(newCard);
+                    hasUnsavedChanges = true;
+
+                    const totalDueEl = document.getElementById('total-due');
+                    totalDueEl.textContent = parseInt(totalDueEl.textContent) + 1;
+                    updateBoard();
+
+                    if (dueQueue.length === 1 && !currentItem) {
+                        nextCard();
+                    }
+                   // alert("New GK added successfully!");
+                } 
+                else if (modalMode === 'edit') {
+                    currentItem.question = parsedData.question;
+                    currentItem.answer = parsedData.answer;
+                    hasUnsavedChanges = true;
+                    
+                    updateBoard();
+                    drawFlashcard();
+                }
+
+                gkModal.style.display = 'none';
+            });
+
+
+            // --- 2. Build Daily Queue --- (Original Logic)
+            function buildDueQueue() {
+                try {
+                    const todayStr = getLocalDate();
+                    const todayDate = new Date(todayStr);
+                    
+                    const hardWordsInput = document.getElementById('hard-words-count');
+                    let hardWordsLimit = hardWordsInput ? parseInt(hardWordsInput.value) : 20;
+                    hardWordsLimit = isNaN(hardWordsLimit) ? 20 : hardWordsLimit;
+                    
+                    // --- STEP 1: Quota Allocation ---
+                    const newLimit = 5;
+                    const reviewLimit = (hardWordsLimit * 2) - 5;
+                    const totalTarget = hardWordsLimit + reviewLimit + newLimit;
+
+                    // --- STEP 2: Pool Categorization ---
+                    let newPool = [];
+                    let highLevelPool = [];
+                    let hardPool = [];
+
+                    flashcards.forEach(card => {
+                        if (card.next_review <= todayStr) {
+                            if (card.level === 0 && card.score === 0) {
+                                newPool.push(card);
+                            } else if (card.level >= 2) {
+                                highLevelPool.push(card);
+                            } else {
+                                hardPool.push(card);
+                            }
+                        }
+                    });
+
+                    const totalDueToday = newPool.length + highLevelPool.length + hardPool.length;
+
+                    // Helper: Calculate overdue days
+                    const getOverdueDays = (reviewDateStr) => {
+                        const reviewDate = new Date(reviewDateStr);
+                        const diffTime = todayDate - reviewDate;
+                        return diffTime > 0 ? Math.floor(diffTime / (1000 * 60 * 60 * 24)) : 0;
+                    };
+
+                    // --- STEP 3: Weighted Priority ---
+                    const prioritySort = (a, b) => {
+                        const weightA = (getOverdueDays(a.next_review) * 2) - a.score;
+                        const weightB = (getOverdueDays(b.next_review) * 2) - b.score;
+                        return weightB - weightA; // Sort descending (Highest weight first)
+                    };
+
+                    hardPool.sort(prioritySort);
+                    highLevelPool.sort(prioritySort);
+                    newPool.sort(() => Math.random() - 0.5); // Randomize New words
+
+                    // Slice targets based on allocations
+                    let selectedHard = hardPool.slice(0, hardWordsLimit);
+                    let selectedReview = highLevelPool.slice(0, reviewLimit);
+                    let selectedNew = newPool.slice(0, newLimit);
+
+                    // --- STEP 4: Shortfall Compensation ---
+                    let currentSelectedTotal = selectedHard.length + selectedReview.length + selectedNew.length;
+                    let selectedFiller = [];
+
+                    if (currentSelectedTotal < totalTarget) {
+                        // Gather unselected cards
+                        let remainingDue = [
+                            ...hardPool.slice(hardWordsLimit),
+                            ...highLevelPool.slice(reviewLimit),
+                            ...newPool.slice(newLimit)
+                        ];
+
+                        if (remainingDue.length > 0) {
+                            let shortfall = totalTarget - currentSelectedTotal;
+                            
+                            // Sort remaining pool using Filler weight equation
+                            remainingDue.sort((a, b) => {
+                                const fillerA = (getOverdueDays(a.next_review) * 2) + a.score;
+                                const fillerB = (getOverdueDays(b.next_review) * 2) + b.score;
+                                return fillerB - fillerA; // Descending
+                            });
+                            
+                            selectedFiller = remainingDue.slice(0, shortfall);
+                        }
+                    }
+
+                    // --- STEP 5: Biased Interleaving ---
+                    selectedHard.forEach(card => card._shuffleWeight = (Math.random() * 0.7) - 0.5);   // [-0.5 to 0.2]
+                    selectedReview.forEach(card => card._shuffleWeight = (Math.random() * 0.8) - 0.4); // [-0.4 to 0.4]
+                    selectedNew.forEach(card => card._shuffleWeight = (Math.random() * 0.9) - 0.5);    // [-0.5 to 0.4]
+                    selectedFiller.forEach(card => card._shuffleWeight = (Math.random() * 0.8) - 0.3); // [-0.3 to 0.5]
+
+                    let finalQueue = [...selectedHard, ...selectedReview, ...selectedNew, ...selectedFiller];
+                    
+                    // Sort final queue by the randomized, biased constraints
+                    finalQueue.sort((a, b) => a._shuffleWeight - b._shuffleWeight);
+
+                    // Clean up temporary property
+                    finalQueue.forEach(card => delete card._shuffleWeight);
+
+                    dueQueue = finalQueue;
+                    
+                    // Update UI Boards
+                    document.getElementById('total-due').textContent = totalDueToday;
+                    updateBoard();
+                    nextCard();
+                    
+                } catch(err) {
+                    console.error("Queue Build Error:", err);
+                }
+            }
+
+            loadMoreBtn.addEventListener('click', () => {
+                buildDueQueue();
+                loadMoreBtn.style.display = 'none';
+            });
+
+            // --- 3. Combined SRS Leitner Algorithm --- (Original Logic)
+            function calculateSRS(currentLevel, rating) {
+                let newLevel = currentLevel;
+                
+                // 2-Button Logic
+                if (rating === 'fail') newLevel = 0;
+                else if (rating === 'pass') newLevel = currentLevel + 1;
+
+                let addDays = 0;
+                if (newLevel === 0) addDays = 0;
+                else if (newLevel === 1) addDays = 1;
+                else if (newLevel === 2) addDays = 2;
+                else if (newLevel === 3) addDays = 5;
+                else if (newLevel === 4) addDays = 9;
+                else if (newLevel === 5) addDays = 14;
+                else addDays = 20;
+
+                let nextDate = new Date();
+                nextDate.setDate(nextDate.getDate() + addDays);
+                return { level: newLevel, next_review: getLocalDate(nextDate) };
+            }
+
+            // --- 4. Handle Feedback & Scoring --- (Original Logic + New Card Rule)
+            function handleFeedback(rating) {
+                if (!currentItem) return;
+
+                hasUnsavedChanges = true; 
+                
+                if (currentItem.pass_streak === undefined) {
+                    currentItem.pass_streak = 0;
+                }
+                if (currentItem.new_consecutive === undefined) {
+                    currentItem.new_consecutive = 0;
+                }
+
+                let isPassed = (rating === 'pass');
+                let isFailed = (rating === 'fail');
+
+                const processedItem = dueQueue.shift(); 
+                let isNewCard = (currentItem.level === 0 && currentItem.score === 0);
+
+                if (isNewCard) {
+                    // --- NEW CARD SPECIAL PROGRESSION ---
+                    if (isPassed) {
+                        currentItem.new_consecutive++; 
+
+                        if (currentItem.new_consecutive >= 3) {
+                            currentItem.score += 1; 
+
+                            const srsResult = calculateSRS(currentItem.level, rating);
+                            currentItem.level = srsResult.level;
+                            currentItem.next_review = srsResult.next_review;
+                            
+                            currentItem.new_consecutive = 0; 
+
+                            const totalDueEl = document.getElementById('total-due');
+                            let currentTotal = parseInt(totalDueEl.textContent);
+                            totalDueEl.textContent = Math.max(0, currentTotal - 1);
+                        } else {
+                            const S = parseInt(document.getElementById('streak-threshold').value) || 2;
+                            const randS = Math.floor(Math.random() * S) + 1; 
+                            const insertIndex = Math.min(7 + (2 * randS), dueQueue.length);
+                            dueQueue.splice(insertIndex, 0, processedItem);
+                        }
+                    } else if (isFailed) {
+                        currentItem.new_consecutive = 0;
+                        // For new cards only, Fail must NOT reduce score: no -2 or any negative score.
+                        
+                        const srsResult = calculateSRS(currentItem.level, rating);
+                        currentItem.level = srsResult.level; 
+                        currentItem.next_review = srsResult.next_review;
+
+                        const S = parseInt(document.getElementById('streak-threshold').value) || 2; 
+                        let minWait = 4 + S;
+                        let maxWait = 6 + (2 * S);
+                        let insertIndex = Math.floor(Math.random() * (maxWait - minWait + 1)) + minWait;
+                        
+                        insertIndex = Math.min(insertIndex, dueQueue.length);
+                        dueQueue.splice(insertIndex, 0, processedItem);
+                    }
+                } else {
+                    // --- EXISTING NORMAL/MANUAL STREAK LOGIC ---
+                    let points = 0;
+                    if (rating === 'fail') {
+                        if (currentItem.level === 0) {
+                            points = -1;
+                        } else {
+                            points = -2;
+                        }
+                    }
+                    if (rating === 'pass') points = 1;
+
+                    if (isPassed) {
+                        if (currentItem.level === 0) {
+                            currentItem.pass_streak++; 
+
+                            // শুধুমাত্র ২য় বার (বা তার বেশি) পাস করলেই পয়েন্ট যোগ হবে এবং লেভেল আপগ্রেড হবে
+                            const streakThreshold = parseInt(document.getElementById('streak-threshold').value) || 2;
+                            if (currentItem.pass_streak >= streakThreshold) {
+                                currentItem.score += points; // ২য় পাসে পয়েন্ট যোগ হচ্ছে
+
+                                const srsResult = calculateSRS(currentItem.level, rating);
+                                currentItem.level = srsResult.level;
+                                currentItem.next_review = srsResult.next_review;
+                                
+                                currentItem.pass_streak = 0; 
+
+                                const totalDueEl = document.getElementById('total-due');
+                                let currentTotal = parseInt(totalDueEl.textContent);
+                                totalDueEl.textContent = Math.max(0, currentTotal - 1);
+                            } else {
+                                const S = parseInt(document.getElementById('streak-threshold').value) || 2;
+								const randS = Math.floor(Math.random() * S) + 1; 
+								const insertIndex = Math.min(7 + (2 * randS), dueQueue.length);
+                                dueQueue.splice(insertIndex, 0, processedItem);
+                            }
+                        } else {
+                            // লেভেল ০ না হলে (অন্যান্য লেভেলে) স্বাভাবিকভাবে সবসময়ই পয়েন্ট যোগ হবে
+                            currentItem.score += points;
+
+                            const srsResult = calculateSRS(currentItem.level, rating);
+                            currentItem.level = srsResult.level;
+                            currentItem.next_review = srsResult.next_review;
+                            
+                            currentItem.pass_streak = 0; 
+
+                            const totalDueEl = document.getElementById('total-due');
+                            let currentTotal = parseInt(totalDueEl.textContent);
+                            totalDueEl.textContent = Math.max(0, currentTotal - 1);
+                        }
+                    } else if (isFailed) {
+                        // ফেইল করলে পয়েন্ট বিয়োগ হবে এবং স্ট্রেইক ০ হয়ে যাবে
+                        currentItem.score += points;
+                        currentItem.pass_streak = 0;
+
+                        const srsResult = calculateSRS(currentItem.level, rating);
+                        currentItem.level = srsResult.level;
+                        currentItem.next_review = srsResult.next_review;
+
+                        const S = parseInt(document.getElementById('streak-threshold').value) || 2;
+                        let minWait = 4 + S;
+                        let maxWait = 6 + (2 * S);
+                        let insertIndex = Math.floor(Math.random() * (maxWait - minWait + 1)) + minWait;
+
+                        insertIndex = Math.min(insertIndex, dueQueue.length);
+                        dueQueue.splice(insertIndex, 0, processedItem);
+                    }
+                }
+
+                updateBoard();
+                nextCard();
+            }
+
+            // Delete Card Logic
+            deleteBtn.addEventListener('click', () => {
+                if (!currentItem) return;
+                
+                const isConfirmed = confirm(`Are you sure you want to permanently delete this card?\n\n"${currentItem.question}"`);
+                
+                if (isConfirmed) {
+                    // Remove from master array
+                    flashcards = flashcards.filter(c => c.question !== currentItem.question || c.answer !== currentItem.answer);
+                    
+                    // Remove from active queue
+                    dueQueue = dueQueue.filter(c => c.question !== currentItem.question || c.answer !== currentItem.answer);
+                    
+                    // Adjust UI totals
+                    const totalDueEl = document.getElementById('total-due');
+                    let currentTotal = parseInt(totalDueEl.textContent);
+                    totalDueEl.textContent = Math.max(0, currentTotal - 1);
+
+                    hasUnsavedChanges = true;
+                    updateBoard();
+                    nextCard();
+                }
+            });
+
+            document.getElementById('btn-fail').onclick = () => handleFeedback('fail');
+            document.getElementById('btn-pass').onclick = () => handleFeedback('pass');
+
+            // --- 5. Display Logic --- (Original Logic)
+            function nextCard() {
+                try {
+                    if (dueQueue.length === 0) {
+                        currentItem = null;
+                        isAnswerVisible = false;
+                        drawFlashcard();
+                        mainControls.style.display = flashcards.length > 0 ? 'flex' : 'none';
+                        feedbackBtns2.style.display = 'none';
+                        showAnswerBtn.style.display = 'none'; 
+                        deleteBtn.style.display = 'none'; 
+                        
+                        if(flashcards.length > 0) {
+                            if (parseInt(document.getElementById('total-due').textContent) > 0) {
+                                loadMoreBtn.style.display = 'inline-block';
+                            }
+                        }
+                        return;
+                    }
+
+                    let nextIndex = 0;
+                    for (let i = 0; i < dueQueue.length; i++) {
+                        if (!recentCardTracker.includes(dueQueue[i].question)) {
+                            nextIndex = i;
+                            break;
+                        }
+                    }
+
+                    currentItem = dueQueue.splice(nextIndex, 1)[0];
+                    dueQueue.unshift(currentItem); 
+
+                    recentCardTracker.push(currentItem.question);
+                    if (recentCardTracker.length > 10) recentCardTracker.shift(); 
+                    
+                    showAnswerBtn.style.display = 'inline-block';
+                    deleteBtn.style.display = 'inline-block'; 
+                    loadMoreBtn.style.display = 'none';
+                    
+                    isAnswerVisible = false;
+                    drawFlashcard();
+                    
+                    mainControls.style.display = 'flex';
+                    feedbackBtns2.style.display = 'none';
+                } catch(err) {
+                    console.error("Display Error:", err);
+                }
+            }
+
+            showAnswerBtn.onclick = () => {
+                if(!currentItem) return;
+                isAnswerVisible = true;
+                drawFlashcard();
+                mainControls.style.display = 'none';
+                feedbackBtns2.style.display = 'flex';
+            };
+
+            // --- Canvas Drawing ---
+            function wrapText(context, text, x, y, maxWidth, lineHeight, font, color) {
+                context.font = font;
+                context.fillStyle = color;
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+
+                let words = (text || "").toString().split(' ');
+                let line = '';
+                let currentY = y;
+                const lines = [];
+
+                for (let n = 0; n < words.length; n++) {
+                    let testLine = line + words[n] + ' ';
+                    let metrics = context.measureText(testLine);
+                    if (metrics.width > maxWidth && n > 0) {
+                        lines.push(line.trim());
+                        line = words[n] + ' ';
+                    } else {
+                        line = testLine;
+                    }
+                }
+                lines.push(line.trim());
+
+                const totalHeight = lines.length * lineHeight;
+                currentY = y - (totalHeight / 2) + (lineHeight / 2);
+
+                lines.forEach(singleLine => {
+                    context.fillText(singleLine, x, currentY);
+                    currentY += lineHeight;
+                });
+            }
+
+            function drawFlashcard() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                if (!currentItem) {
+                    ctx.fillStyle = COLOR_Q;
+                    ctx.font = FONT_PRIMARY;
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(flashcards.length === 0 ? "Setup Required!" : "Session chunk complete!", canvas.width/2, canvas.height/2);
+                    return;
+                }
+
+                ctx.fillStyle = COLOR_HINT;
+                ctx.font = "14px Poppins";
+                ctx.textAlign = "left";
+                ctx.textBaseline = "alphabetic";
+                ctx.fillText("Mode: Question ➔ Answer", 20, 30);
+
+                const qText = currentItem.question;
+                const aText = currentItem.answer;
+
+                let qCenterY = isAnswerVisible ? canvas.height * 0.35 : canvas.height / 2;
+                wrapText(ctx, qText, canvas.width / 2, qCenterY, canvas.width - 80, 35, FONT_PRIMARY, COLOR_Q);
+
+                if (isAnswerVisible) {
+                    ctx.beginPath();
+                    ctx.moveTo(100, canvas.height / 2);
+                    ctx.lineTo(canvas.width - 100, canvas.height / 2);
+                    ctx.strokeStyle = "#ecf0f1";
+                    ctx.stroke();
+
+                    wrapText(ctx, aText, canvas.width / 2, canvas.height * 0.7, canvas.width - 80, 30, FONT_SECONDARY, COLOR_A);
+                }
+            }
+
+            // --- 6. Helpers ---
+            function updateBoard() {
+                document.getElementById('due-count').textContent = dueQueue.length;
+                document.getElementById('total-count').textContent = flashcards.length;
+            }
+
+            function updateMessage(txt, type) {
+                if(messageArea) {
+                    messageArea.textContent = txt;
+                    messageArea.className = type;
+                }
+            }
+
+            // --- 7. Export Database to TXT --- (Original Logic)
+            document.getElementById('export-btn').onclick = () => {
+                if (flashcards.length === 0) return;
+                
+                let cleanFileName = currentDeckName.replace(/\s\(\d+\)/g, '');
+                if (!cleanFileName.endsWith('.txt')) cleanFileName += '.txt';
+
+                // Format the output: Question > Answer > Level > Score > Duedate
+                const fileLines = flashcards.map(card => {
+					return `${card.question} > ${card.answer} > ${card.level} > ${card.score} > ${card.next_review}`;
+				});
+                
+                const content = fileLines.join('\n');
+
+                const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = cleanFileName;
+                a.click();
+                URL.revokeObjectURL(a.href);
+                
+                hasUnsavedChanges = false; 
+                alert(`Database Saved as ${cleanFileName}! Keep this file safe. 💾`);
+            };
+
+            // Start screen init
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // --- Export Low Score Cards Functionality ---
+            const exportLowScoreBtn = document.getElementById('export-low-score-btn');
+            if (exportLowScoreBtn) {
+                exportLowScoreBtn.addEventListener('click', () => {
+                    if (flashcards.length === 0) {
+                        alert("আগে Database (.txt) আপলোড করুন!");
+                        return;
+                    }
+
+                    const value = Number(document.getElementById("export-max-score").value);
+                    if (Number.isNaN(value)) {
+                        alert("Invalid Score");
+                        return;
+                    }
+
+                    const targetCards = flashcards.filter(card => card.score < value);
+
+                    if (targetCards.length === 0) {
+                        alert(`আপনার ডাটাবেসে ${value} এর নিচে স্কোর থাকা কোনো কার্ড নেই।`);
+                        return;
+                    }
+
+                    const fileLines = targetCards.map(card => `${card.question} > ${card.answer}`);
+                    const content = fileLines.join('\n');
+
+                    const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    
+                    let baseName = currentDeckName.replace('.txt', '');
+                    a.download = `${baseName}_scoreBelow${value}.txt`;
+                    
+                    a.click();
+                    URL.revokeObjectURL(a.href);
+                });
+            }
+
+			// --- Keyboard Shortcuts
+			document.addEventListener('keydown', (event) => {
+				if (playerPage.style.display !== 'block') return;
+				if (gkModal.style.display === 'flex') return;
+
+				// Ignore auto-repeat when a key is held down
+				if (event.repeat) return;
+
+				// RIGHT ALT = Show Answer / Fail
+				if (event.code === 'AltRight') {
+					event.preventDefault();
+
+					if (currentItem && !isAnswerVisible) {
+						showAnswerBtn.click();
+					} 
+					else if (currentItem && isAnswerVisible) {
+						const failBtn = document.getElementById('btn-fail');
+						if (failBtn.offsetParent !== null) failBtn.click();
+					}
+
+					return;
+				}
+
+				// RIGHT CTRL = Save Progress / Pass
+				if (event.code === 'ControlRight') {
+					event.preventDefault();
+
+					if (!currentItem || (currentItem && !isAnswerVisible)) {
+						document.getElementById('export-btn').click();
+					} 
+					else if (currentItem && isAnswerVisible) {
+						const passBtn = document.getElementById('btn-pass');
+						if (passBtn.offsetParent !== null) passBtn.click();
+					}
+
+					return;
+				}
+			});
+        });
+    </script>
+</body>
+</html>

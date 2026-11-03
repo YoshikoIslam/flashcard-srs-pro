@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Flashcard Pro - TXT Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding-top: 15px;
+            color: #444;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            text-align: center;
+            width: 90%;
+            max-width: 800px;
+            animation: fadeIn 0.5s ease-out;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { color: #2c3e50; margin-top: 0; margin-bottom: 15px; font-size: 2em; }
+
+        /* Setup Page Styles */
+        .settings-panel {
+            background-color: #f9fafc;
+            border: 1px solid #d0dbe5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .setting-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #dde4ec;
+        }
+        .setting-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+        .setting-label { font-weight: 600; color: #34495e; }
+
+        input[type="email"], input[type="password"], input[type="number"], input[type="file"], select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #bdc3c7;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95em;
+            background-color: white;
+            color: #2c3e50;
+            box-sizing: border-box;
+        }
+        
+        #start-learning-btn {
+            background-color: #27ae60;
+            color: white;
+            font-size: 1.2em;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(39, 174, 96, 0.2);
+        }
+        #start-learning-btn:hover:not(:disabled) { background-color: #219653; transform: translateY(-2px); }
+        #start-learning-btn:disabled { background-color: #bdc3c7; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Player Page Styles */
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        #back-btn {
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        #back-btn:hover { background-color: #bdc3c7; color: #2c3e50; }
+
+        #delete-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        #delete-btn:hover { background-color: #c0392b; transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+        .status-board {
+            font-size: 1.1em;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            color: #34495e;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px;
+            background-color: #eaf1f8;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        #due-count, #total-due, #total-count { 
+            color: #e74c3c; 
+        }
+
+        .mobile-label { display: none; }
+        .desktop-label { display: inline; }
+
+        #flashcard-canvas {
+            background-color: #fdfdfd;
+            border: 1px solid #dde4ec;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .controls, .feedback-btns {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* Shared Button Styles */
+        .controls button, .feedback-btns button {
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 500;
+            margin: 6px;
+            min-width: 120px;
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .controls button:hover, .feedback-btns button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Hierarchy Groups */
+        .primary-group {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+
+        .secondary-group {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            border-top: 1px dashed #dde4ec;
+            padding-top: 15px;
+            margin-top: 5px;
+        }
+
+        /* Standard Controls Color Overrides (Only color!) */
+        #show-answer-btn, #export-btn, #add-gk-btn { 
+            background-color: #34495e; 
+            color: #fff;
+            min-width: 150px; 
+        }
+        #edit-gk-btn { background-color: #16a085; color: #fff; min-width: 90px; }
+        #load-more-btn { background-color: #8e44ad; display: none;} 
+
+        /* SRS Feedback Colors */
+        .btn-again { background-color: #e74c3c; } 
+        .btn-good { background-color: #27ae60; }  
+
+        #message-area {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        .info-message { color: #2980b9; background-color: #eaf6ff; border: 1px solid #c2dcf2; }
+        .success-message { color: #27ae60; background-color: #e9f7ef; border: 1px solid #d4efdf; }
+        .error-message { color: #e74c3c; background-color: #fdedf0; border: 1px solid #fadbd8; }
+
+        /* Reusable Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: left;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .modal-content textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #bdc3c7;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95em;
+            resize: vertical;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .modal-content textarea:focus {
+            border-color: #3498db;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            color: white;
+        }
+
+        #btn-modal-save { background-color: #27ae60; }
+        #btn-modal-cancel { background-color: #95a5a6; }
+
+        /* --- RESPONSIVE DESIGN ADDITIONS --- */
+        input[type="file"] { width: 100%; }
+        input[type="number"], select { max-width: 100%; }
+        
+        @media (max-width: 768px) {
+            .container { padding: 20px; width: 95%; }
+            .status-board { font-size: 1em; padding: 10px; }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 12px 14px; }
+            h1 { font-size: 1.5em; margin-bottom: 10px; }
+            .status-board { font-size: 0.85em; padding: 8px; gap: 5px; justify-content: space-between; margin-bottom: 10px; }
+            .desktop-label { display: none; }
+            .mobile-label { display: inline; }
+            #back-btn, #delete-btn { padding: 6px 12px; font-size: 0.9em; }
+            .controls button, .feedback-btns button { min-width: 45%; margin: 4px; padding: 8px 10px; font-size: 0.85em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div id="setup-page">
+            <h1>Smart Flashcard Pro</h1>
+
+            <div class="settings-panel" id="account-panel">
+                <h3 style="margin-top:0; color:#2c3e50;">Cloud Account</h3>
+                <div id="auth-status" class="info-message" style="margin:0 0 12px;">Connect to your account to sync progress across devices.</div>
+                <div class="setting-group" style="border-bottom:none;">
+                    <input type="email" id="auth-email" placeholder="Email address" autocomplete="username" style="flex:1; min-width:180px;">
+                    <input type="password" id="auth-password" placeholder="Password" autocomplete="current-password" style="flex:1; min-width:180px;">
+                </div>
+                <div class="controls" style="margin:0; justify-content:flex-start;">
+                    <button type="button" id="login-btn" style="background:#2471a3;">Login</button>
+                    <button type="button" id="signup-btn" style="background:#16a085;">Create Account</button>
+                    <button type="button" id="logout-btn" style="background:#7f8c8d; display:none;">Logout</button>
+                </div>
+                <div id="auth-feedback" aria-live="polite" style="font-size:0.9em; margin-top:8px;"></div>
+            </div>
+            
+            <div class="settings-panel">
+                <div class="setting-group">
+                    <span class="setting-label">1. Select Database:</span>
+                    <select id="deck-select" disabled style="min-width:220px; flex:1;">
+                        <option value="">Login to load datasets...</option>
+                    </select>
+                </div>
+
+                <div class="setting-group">
+                    <span class="setting-label">2. Hard Words Limits:</span>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="text-align: center;">
+                            <label style="display:block; font-size:0.8em; color:#7f8c8d;">Count (Level < 2)</label>
+                            <input type="number" id="hard-words-count" value="20" min="5" max="200" style="width: 70px;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <span class="setting-label">3. Winning Streak (Level 0):</span>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="text-align: center;">
+                            <label style="display:block; font-size:0.8em; color:#7f8c8d;">Pass Target</label>
+                            <input type="number" id="streak-threshold" value="2" min="1" max="10" style="width: 70px;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <span class="setting-label">4. Export Specific Score Cards:</span>
+                    <div style="display: flex; gap: 10px; align-items: flex-end;">
+                        <div>
+                            <label style="display:block; font-size:0.8em; color:#7f8c8d;">Score Below (<)</label>
+                            <input type="number" id="export-max-score" value="0" style="width: 70px;">
+                        </div>
+                        <button id="export-low-score-btn" style="background-color: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; height: 38px;">Export .txt</button>
+                    </div>
+                </div>
+            </div>
+
+            <button id="start-learning-btn" disabled>Upload Database to Start 🚀</button>
+            <div id="message-area" class="info-message">Upload your .txt file (Format: Qstn &gt; Ans &gt; Lvl &gt; Score).</div>
+        </div>
+
+        <div id="player-page" style="display: none;">
+            
+            <div class="header-bar">
+                <button id="back-btn">⬅ Settings</button>
+                <button id="delete-btn" style="display: none;" title="Permanently delete this card">Delete 🗑️</button>
+            </div>
+            
+            <div id="cloud-sync-status" class="info-message" style="margin:0 0 10px;">Cloud sync is ready when you sign in.</div>
+            <div class="status-board">
+                <div>
+                    <span class="desktop-label">Session Queue:</span>
+                    <span class="mobile-label">Q:</span>
+                    <span id="due-count">0</span>
+                </div>
+                <div>
+                    <span class="desktop-label">Total Due Today:</span>
+                    <span class="mobile-label">Due:</span>
+                    <span id="total-due">0</span>
+                </div>
+                <div>
+                    <span class="desktop-label">Total DB:</span>
+                    <span class="mobile-label">DB:</span>
+                    <span id="total-count">0</span>
+                </div>
+            </div>
+
+            <canvas id="flashcard-canvas" width="700" height="350"></canvas>
+
+            <div class="controls" id="main-controls" style="display: none;">
+                <button id="show-answer-btn">Show Answer 👀</button>
+                <button id="add-gk-btn">Add GK ➕</button>
+                <button id="sync-btn" style="background-color:#2471a3;">Save to Cloud ☁️</button>
+                <button id="export-btn">Download Backup 💾</button>
+                <button id="load-more-btn">Load Next Chunk 🔄</button>
+            </div>
+
+            <div id="feedback-btns-2" class="feedback-btns" style="display: none;">
+                <button id="btn-fail" class="btn-again">Fail <br></button>
+                <button id="edit-gk-btn">Edit ✏️</button>
+                <button id="btn-pass" class="btn-good">Pass <br></button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="gk-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Add / Edit GK</h3>
+            <textarea id="modal-input" placeholder="Question > Answer (Example: দক্ষিণ আমেরিকার সবচেয়ে উত্তরের দেশ কোনটি > কলম্বো)"></textarea>
+            <div class="modal-actions">
+                <button id="btn-modal-cancel">Cancel</button>
+                <button id="btn-modal-save">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+</body>
+</html>
