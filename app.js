@@ -108,6 +108,11 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
             if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
             if (setupThemeToggleBtn) setupThemeToggleBtn.addEventListener('click', toggleTheme);
+            window.onThemeChanged = function() {
+                if (playerPage.style.display === 'block') {
+                    drawFlashcard();
+                }
+            };
 
             let initialTheme = 'light';
             try {
@@ -920,7 +925,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
                 let lineHeight = Math.round(fontSize * 1.48);
 
                 while (fontSize >= minFontSize) {
-                    context.font = `${fontWeight} ${fontSize}px 'Hind Siliguri', 'Poppins', sans-serif`;
+                    context.font = `${fontWeight} ${fontSize}px 'Noto Sans Bengali', 'Poppins', sans-serif`;
                     lineHeight = Math.round(fontSize * 1.48);
                     const words = (text || "").toString().split(' ');
                     lines = [];
@@ -947,7 +952,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
                     fontSize -= 2;
                 }
 
-                context.font = `${fontWeight} ${fontSize}px 'Hind Siliguri', 'Poppins', sans-serif`;
+                context.font = `${fontWeight} ${fontSize}px 'Noto Sans Bengali', 'Poppins', sans-serif`;
                 context.fillStyle = color;
                 context.textAlign = 'center';
                 context.textBaseline = 'middle';
@@ -973,7 +978,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
                 if (!currentItem) {
                     ctx.fillStyle = theme.q;
-                    ctx.font = `bold ${canvas.width > 500 ? '24px' : '20px'} 'Hind Siliguri', 'Poppins', sans-serif`;
+                    ctx.font = `bold ${canvas.width > 500 ? '24px' : '20px'} 'Noto Sans Bengali', 'Poppins', sans-serif`;
                     ctx.textAlign = "center";
                     ctx.textBaseline = 'middle';
                     ctx.fillText(flashcards.length === 0 ? "Setup Required!" : "Session chunk complete!", canvas.width / 2, canvas.height / 2);
@@ -981,7 +986,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
                 }
 
                 ctx.fillStyle = theme.hint;
-                ctx.font = "13px 'Hind Siliguri', 'Poppins', sans-serif";
+                ctx.font = "13px 'Noto Sans Bengali', 'Poppins', sans-serif";
                 ctx.textAlign = "left";
                 ctx.textBaseline = "alphabetic";
                 ctx.fillText("Mode: Question ➔ Answer", 20, 26);

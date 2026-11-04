@@ -6,7 +6,7 @@
     <title>Smart Flashcard Pro - TXT Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -128,7 +128,7 @@
         }
 
         body {
-            font-family: 'Hind Siliguri', 'Poppins', sans-serif;
+            font-family: 'Noto Sans Bengali', 'Poppins', sans-serif;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -593,6 +593,49 @@
             }
         }
     </style>
+    <!-- Robust Standalone Theme Handler: Works instantly even on file:// or before external modules load -->
+    <script>
+        function applyAppTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            try { localStorage.setItem('sfp_theme', theme); } catch(e) {}
+            var isDark = (theme === 'dark');
+            var icon = isDark ? '☀️' : '🌙';
+            var title = isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+            
+            var b1 = document.getElementById('theme-toggle-btn');
+            var b2 = document.getElementById('setup-theme-toggle-btn');
+            if (b1) { b1.textContent = icon; b1.title = title; }
+            if (b2) { b2.textContent = icon; b2.title = title; }
+            
+            if (typeof window.onThemeChanged === 'function') {
+                window.onThemeChanged(theme);
+            }
+        }
+
+        function toggleTheme() {
+            var curr = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+            var next = curr === 'dark' ? 'light' : 'dark';
+            applyAppTheme(next);
+        }
+
+        // Apply immediately to prevent theme flash
+        (function() {
+            var saved = 'light';
+            try {
+                saved = localStorage.getItem('sfp_theme') || 
+                    (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            } catch(e) {}
+            document.documentElement.setAttribute('data-theme', saved);
+            
+            window.addEventListener('DOMContentLoaded', function() {
+                applyAppTheme(saved);
+                var b1 = document.getElementById('theme-toggle-btn');
+                var b2 = document.getElementById('setup-theme-toggle-btn');
+                if (b1) b1.onclick = toggleTheme;
+                if (b2) b2.onclick = toggleTheme;
+            });
+        })();
+    </script>
 </head>
 <body>
     <div class="container">
@@ -600,7 +643,7 @@
         <div id="setup-page">
             <div class="setup-header">
                 <h1>Smart Flashcard Pro</h1>
-                <button id="setup-theme-toggle-btn" class="theme-toggle-btn" type="button" title="Toggle Dark/Light Mode">🌙</button>
+                <button id="setup-theme-toggle-btn" class="theme-toggle-btn" type="button" onclick="toggleTheme()" title="Toggle Dark/Light Mode">🌙</button>
             </div>
 
             <div class="settings-panel" id="account-panel">
@@ -667,7 +710,7 @@
             <div class="header-bar">
                 <button id="back-btn">⬅ Settings</button>
                 <div class="header-actions">
-                    <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" title="Toggle Dark/Light Mode">🌙</button>
+                    <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" onclick="toggleTheme()" title="Toggle Dark/Light Mode">🌙</button>
                     <button id="delete-btn" style="display: none;" title="Permanently delete this card">Delete 🗑️</button>
                 </div>
             </div>
