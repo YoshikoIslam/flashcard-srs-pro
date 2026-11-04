@@ -315,65 +315,6 @@
             #back-btn, #delete-btn { padding: 6px 12px; font-size: 0.9em; }
             .controls button, .feedback-btns button { min-width: 45%; margin: 4px; padding: 8px 10px; font-size: 0.85em; }
         }
-
-        /* Mobile-only flashcard and feedback layout */
-        @media (max-width: 600px) {
-            #flashcard-canvas {
-                width: min(100%, 360px);
-                height: auto;
-                aspect-ratio: 1 / 1;
-                max-width: 100%;
-            }
-            #feedback-btns-2 {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: space-between;
-                gap: 4px;
-            }
-            #feedback-btns-2 #btn-fail,
-            #feedback-btns-2 #btn-pass {
-                flex: 1 1 calc(50% - 8px);
-                min-width: 0;
-                margin: 2px;
-                min-height: 44px;
-                font-size: 1em;
-            }
-            #feedback-btns-2 #edit-gk-btn {
-                flex: 0 0 100%;
-                min-width: 0;
-                margin: 4px 0 0;
-                min-height: 42px;
-            }
-            #theme-toggle {
-                padding: 6px 10px;
-                border: 0;
-                border-radius: 6px;
-                background: #34495e;
-                color: #fff;
-                font-weight: 600;
-                cursor: pointer;
-            }
-        }
-
-        /* Dark theme: one coordinated navy/slate palette */
-        body.dark-mode { background: linear-gradient(135deg, #0b1220 0%, #172437 100%); color: #e6edf7; }
-        body.dark-mode .container { background: #172437; color: #e6edf7; box-shadow: 0 10px 30px rgba(0,0,0,.38); }
-        body.dark-mode h1, body.dark-mode .setting-label { color: #e6edf7; }
-        body.dark-mode .settings-panel { background: #1e3046; border-color: #354b64; }
-        body.dark-mode .setting-group, body.dark-mode .secondary-group { border-color: #354b64; }
-        body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background: #111d2d; color: #edf3fb; border-color: #405671; }
-        body.dark-mode input::placeholder, body.dark-mode textarea::placeholder { color: #9aabc0; }
-        body.dark-mode .status-board { background: #24384f; color: #e6edf7; }
-        body.dark-mode #flashcard-canvas { background: #1e3046; border-color: #405671; box-shadow: 0 4px 12px rgba(0,0,0,.22); }
-        body.dark-mode #back-btn { background: #30445d; color: #edf3fb; }
-        body.dark-mode #theme-toggle { background: #e8edf5; color: #172437; }
-        body.dark-mode .modal-content { background: #1e3046; color: #e6edf7; border: 1px solid #405671; }
-        body.dark-mode .info-message { color: #c5e1ff; background: #1b3852; border-color: #345a7a; }
-        body.dark-mode .success-message { color: #a7f3d0; background: #153d35; border-color: #286b5b; }
-        body.dark-mode .error-message { color: #fecaca; background: #452530; border-color: #75404c; }
-        body.dark-mode #show-answer-btn, body.dark-mode #export-btn, body.dark-mode #add-gk-btn { background-color: #30465f; color: #f4f7fb; }
-        body.dark-mode #edit-gk-btn { background-color: #0f8f7c; }
-        body.dark-mode #sync-btn { background-color: #246b9a !important; }
     </style>
 </head>
 <body>
@@ -445,7 +386,6 @@
             
             <div class="header-bar">
                 <button id="back-btn">⬅ Settings</button>
-                <button id="theme-toggle" type="button" aria-label="Toggle dark mode">🌙 Dark</button>
                 <button id="delete-btn" style="display: none;" title="Permanently delete this card">Delete 🗑️</button>
             </div>
             
@@ -479,9 +419,9 @@
             </div>
 
             <div id="feedback-btns-2" class="feedback-btns" style="display: none;">
-                <button id="btn-fail" class="btn-again">Fail</button>
-                <button id="btn-pass" class="btn-good">Pass</button>
+                <button id="btn-fail" class="btn-again">Fail <br></button>
                 <button id="edit-gk-btn">Edit ✏️</button>
+                <button id="btn-pass" class="btn-good">Pass <br></button>
             </div>
         </div>
 
@@ -498,26 +438,6 @@
         </div>
     </div>
 
-    <script>
-        (() => {
-            const key = 'flashcard-srs-theme';
-            const button = document.getElementById('theme-toggle');
-            const applyTheme = (dark) => {
-                document.body.classList.toggle('dark-mode', dark);
-                if (button) button.textContent = dark ? '☀️ Light' : '🌙 Dark';
-            };
-            let saved = null;
-            try { saved = localStorage.getItem(key); } catch (_) {}
-            applyTheme(saved ? saved === 'dark' : false);
-            if (button) {
-                button.addEventListener('click', () => {
-                    const dark = !document.body.classList.contains('dark-mode');
-                    applyTheme(dark);
-                    try { localStorage.setItem(key, dark ? 'dark' : 'light'); } catch (_) {}
-                });
-            }
-        })();
-    </script>
     <script type="module" src="./app.js"></script>
 </body>
 </html>
