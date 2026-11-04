@@ -320,7 +320,8 @@
         @media (max-width: 600px) {
             #flashcard-canvas {
                 width: min(100%, 360px);
-                height: min(92vw, 360px);
+                height: auto;
+                aspect-ratio: 1 / 1;
                 max-width: 100%;
             }
             #feedback-btns-2 {
@@ -354,21 +355,25 @@
             }
         }
 
-        /* Dark theme: controlled by the small inline script below */
-        body.dark-mode { background: linear-gradient(135deg, #111827 0%, #1f2937 100%); color: #e5e7eb; }
-        body.dark-mode .container { background: #182230; color: #e5e7eb; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
-        body.dark-mode h1, body.dark-mode .setting-label { color: #e5e7eb; }
-        body.dark-mode .settings-panel { background: #202d3d; border-color: #3a4a5f; }
-        body.dark-mode .setting-group { border-bottom-color: #3a4a5f; }
-        body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background: #111c2a; color: #f3f4f6; border-color: #526176; }
-        body.dark-mode .status-board { background: #26364a; color: #e5e7eb; }
-        body.dark-mode #flashcard-canvas { background: #202d3d; border-color: #43536a; }
-        body.dark-mode #back-btn { background: #344357; color: #e5e7eb; }
-        body.dark-mode #theme-toggle { background: #e5e7eb; color: #1f2937; }
-        body.dark-mode .modal-content { background: #202d3d; color: #e5e7eb; }
-        body.dark-mode .info-message { color: #b9dcff; background: #1c344c; border-color: #315575; }
-        body.dark-mode .success-message { color: #a7f3d0; background: #153b32; border-color: #24634f; }
-        body.dark-mode .error-message { color: #fecaca; background: #451f27; border-color: #71313d; }
+        /* Dark theme: one coordinated navy/slate palette */
+        body.dark-mode { background: linear-gradient(135deg, #0b1220 0%, #172437 100%); color: #e6edf7; }
+        body.dark-mode .container { background: #172437; color: #e6edf7; box-shadow: 0 10px 30px rgba(0,0,0,.38); }
+        body.dark-mode h1, body.dark-mode .setting-label { color: #e6edf7; }
+        body.dark-mode .settings-panel { background: #1e3046; border-color: #354b64; }
+        body.dark-mode .setting-group, body.dark-mode .secondary-group { border-color: #354b64; }
+        body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background: #111d2d; color: #edf3fb; border-color: #405671; }
+        body.dark-mode input::placeholder, body.dark-mode textarea::placeholder { color: #9aabc0; }
+        body.dark-mode .status-board { background: #24384f; color: #e6edf7; }
+        body.dark-mode #flashcard-canvas { background: #1e3046; border-color: #405671; box-shadow: 0 4px 12px rgba(0,0,0,.22); }
+        body.dark-mode #back-btn { background: #30445d; color: #edf3fb; }
+        body.dark-mode #theme-toggle { background: #e8edf5; color: #172437; }
+        body.dark-mode .modal-content { background: #1e3046; color: #e6edf7; border: 1px solid #405671; }
+        body.dark-mode .info-message { color: #c5e1ff; background: #1b3852; border-color: #345a7a; }
+        body.dark-mode .success-message { color: #a7f3d0; background: #153d35; border-color: #286b5b; }
+        body.dark-mode .error-message { color: #fecaca; background: #452530; border-color: #75404c; }
+        body.dark-mode #show-answer-btn, body.dark-mode #export-btn, body.dark-mode #add-gk-btn { background-color: #30465f; color: #f4f7fb; }
+        body.dark-mode #edit-gk-btn { background-color: #0f8f7c; }
+        body.dark-mode #sync-btn { background-color: #246b9a !important; }
     </style>
 </head>
 <body>
