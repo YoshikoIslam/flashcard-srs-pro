@@ -1,49 +1,185 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Flashcard Pro - TXT Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --container-bg: #ffffff;
+            --container-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            --card-bg: #fdfdfd;
+            --panel-bg: #f9fafc;
+            --panel-border: #d0dbe5;
+            --border-color: #dde4ec;
+            --border-dashed: #dde4ec;
+            
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --text-body: #444444;
+            
+            --input-bg: #ffffff;
+            --input-border: #bdc3c7;
+            --focus-ring: #3498db;
+            
+            --status-bg: #eaf1f8;
+            --status-text: #34495e;
+            --stat-highlight: #e74c3c;
+            
+            --btn-fail-bg: #e74c3c;
+            --btn-fail-hover: #c0392b;
+            --btn-pass-bg: #27ae60;
+            --btn-pass-hover: #219653;
+            --btn-edit-bg: #16a085;
+            --btn-edit-hover: #138d75;
+            --btn-sync-bg: #2471a3;
+            --btn-sync-hover: #1f618d;
+            --btn-show-bg: #34495e;
+            --btn-show-hover: #2c3e50;
+            --btn-export-bg: #34495e;
+            --btn-export-hover: #2c3e50;
+            --btn-load-more-bg: #8e44ad;
+            --btn-load-more-hover: #7d3c98;
+            --btn-back-bg: #ecf0f1;
+            --btn-back-text: #7f8c8d;
+            --btn-back-hover: #bdc3c7;
+            --btn-delete-bg: #e74c3c;
+            --btn-delete-hover: #c0392b;
+            
+            --theme-toggle-bg: #f1f5f9;
+            --theme-toggle-border: #cbd5e1;
+            --theme-toggle-hover: #e2e8f0;
+            
+            --msg-info-bg: #eaf6ff;
+            --msg-info-text: #2980b9;
+            --msg-info-border: #c2dcf2;
+            --msg-success-bg: #e9f7ef;
+            --msg-success-text: #27ae60;
+            --msg-success-border: #d4efdf;
+            --msg-error-bg: #fdedf0;
+            --msg-error-text: #e74c3c;
+            --msg-error-border: #fadbd8;
+        }
+
+        [data-theme="dark"] {
+            --bg-gradient: linear-gradient(135deg, #090d16 0%, #0f172a 100%);
+            --container-bg: #0f172a;
+            --container-shadow: 0 14px 35px rgba(0, 0, 0, 0.45);
+            --card-bg: #1e293b;
+            --panel-bg: #182234;
+            --panel-border: #334155;
+            --border-color: #334155;
+            --border-dashed: #334155;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-body: #cbd5e1;
+            
+            --input-bg: #1e293b;
+            --input-border: #475569;
+            --focus-ring: #38bdf8;
+            
+            --status-bg: #1e293b;
+            --status-text: #cbd5e1;
+            --stat-highlight: #f87171;
+            
+            --btn-fail-bg: #ef4444;
+            --btn-fail-hover: #dc2626;
+            --btn-pass-bg: #22c55e;
+            --btn-pass-hover: #16a34a;
+            --btn-edit-bg: #0d9488;
+            --btn-edit-hover: #14b8a6;
+            --btn-sync-bg: #2563eb;
+            --btn-sync-hover: #1d4ed8;
+            --btn-show-bg: #475569;
+            --btn-show-hover: #334155;
+            --btn-export-bg: #475569;
+            --btn-export-hover: #334155;
+            --btn-load-more-bg: #9333ea;
+            --btn-load-more-hover: #7e22ce;
+            --btn-back-bg: #1e293b;
+            --btn-back-text: #cbd5e1;
+            --btn-back-hover: #334155;
+            --btn-delete-bg: #dc2626;
+            --btn-delete-hover: #b91c1c;
+            
+            --theme-toggle-bg: #1e293b;
+            --theme-toggle-border: #475569;
+            --theme-toggle-hover: #334155;
+            
+            --msg-info-bg: rgba(56, 189, 248, 0.12);
+            --msg-info-text: #38bdf8;
+            --msg-info-border: rgba(56, 189, 248, 0.28);
+            --msg-success-bg: rgba(74, 222, 128, 0.12);
+            --msg-success-text: #4ade80;
+            --msg-success-border: rgba(74, 222, 128, 0.28);
+            --msg-error-bg: rgba(248, 113, 113, 0.12);
+            --msg-error-text: #f87171;
+            --msg-error-border: rgba(248, 113, 113, 0.28);
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Hind Siliguri', 'Poppins', sans-serif;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: var(--bg-gradient);
             margin: 0;
             padding-top: 15px;
-            color: #444;
+            padding-bottom: 25px;
+            color: var(--text-body);
         }
 
         .container {
-            background-color: #ffffff;
+            background-color: var(--container-bg);
             padding: 20px 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            border-radius: 14px;
+            box-shadow: var(--container-shadow);
             text-align: center;
             width: 90%;
             max-width: 800px;
-            animation: fadeIn 0.5s ease-out;
+            animation: fadeIn 0.4s ease-out;
             position: relative;
-            box-sizing: border-box;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
+            from { opacity: 0; transform: translateY(-8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        h1 { color: #2c3e50; margin-top: 0; margin-bottom: 15px; font-size: 2em; }
+        .setup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .setup-header h1 {
+            color: var(--text-primary);
+            margin: 0;
+            font-size: 1.85em;
+            text-align: left;
+        }
+
+        h1 { color: var(--text-primary); margin-top: 0; margin-bottom: 15px; font-size: 2em; }
+        h3 { color: var(--text-primary); }
 
         /* Setup Page Styles */
         .settings-panel {
-            background-color: #f9fafc;
-            border: 1px solid #d0dbe5;
-            border-radius: 8px;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
             padding: 20px;
             margin-bottom: 15px;
             text-align: left;
@@ -57,25 +193,31 @@
             flex-wrap: wrap;
             gap: 10px;
             padding-bottom: 10px;
-            border-bottom: 1px dashed #dde4ec;
+            border-bottom: 1px dashed var(--border-dashed);
         }
         .setting-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
-        .setting-label { font-weight: 600; color: #34495e; }
+        .setting-label { font-weight: 600; color: var(--text-primary); }
 
         input[type="email"], input[type="password"], input[type="number"], input[type="file"], select {
             padding: 8px 12px;
             border-radius: 6px;
-            border: 1px solid #bdc3c7;
-            font-family: 'Poppins', sans-serif;
+            border: 1px solid var(--input-border);
+            font-family: inherit;
             font-size: 0.95em;
-            background-color: white;
-            color: #2c3e50;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
             box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--focus-ring);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
         }
         
         #start-learning-btn {
-            background-color: #27ae60;
+            background-color: var(--btn-pass-bg);
             color: white;
             font-size: 1.2em;
             padding: 12px 30px;
@@ -86,9 +228,10 @@
             width: 100%;
             transition: all 0.2s ease;
             box-shadow: 0 4px 6px rgba(39, 174, 96, 0.2);
+            font-family: inherit;
         }
-        #start-learning-btn:hover:not(:disabled) { background-color: #219653; transform: translateY(-2px); }
-        #start-learning-btn:disabled { background-color: #bdc3c7; cursor: not-allowed; transform: none; box-shadow: none; }
+        #start-learning-btn:hover:not(:disabled) { background-color: var(--btn-pass-hover); transform: translateY(-2px); }
+        #start-learning-btn:disabled { background-color: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.6; }
 
         /* Player Page Styles */
         .header-bar {
@@ -96,68 +239,99 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle-btn {
+            background-color: var(--theme-toggle-bg);
+            border: 1px solid var(--theme-toggle-border);
+            color: var(--text-primary);
+            padding: 7px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.05em;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .theme-toggle-btn:hover {
+            background-color: var(--theme-toggle-hover);
+            transform: translateY(-1px);
         }
 
         #back-btn {
-            background-color: #ecf0f1;
-            color: #7f8c8d;
-            border: none;
+            background-color: var(--btn-back-bg);
+            color: var(--btn-back-text);
+            border: 1px solid var(--border-color);
             padding: 8px 15px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
+            font-family: inherit;
             transition: all 0.2s ease;
         }
-        #back-btn:hover { background-color: #bdc3c7; color: #2c3e50; }
+        #back-btn:hover { background-color: var(--btn-back-hover); color: var(--text-primary); }
 
         #delete-btn {
-            background-color: #e74c3c;
+            background-color: var(--btn-delete-bg);
             color: white;
             border: none;
             padding: 8px 15px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
+            font-family: inherit;
             transition: all 0.2s ease;
         }
-        #delete-btn:hover { background-color: #c0392b; transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #delete-btn:hover { background-color: var(--btn-delete-hover); transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
         .status-board {
-            font-size: 1.1em;
+            font-size: 1.05em;
             margin-top: 5px;
             margin-bottom: 15px;
-            color: #34495e;
+            color: var(--status-text);
             display: flex;
             justify-content: space-around;
             align-items: center;
             padding: 12px;
-            background-color: #eaf1f8;
+            background-color: var(--status-bg);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-weight: 600;
         }
         
         #due-count, #total-due, #total-count { 
-            color: #e74c3c; 
+            color: var(--stat-highlight); 
         }
 
         .mobile-label { display: none; }
         .desktop-label { display: inline; }
 
+        /* Canvas: Rectangular 2:1 on Laptop/Desktop, Square 1:1 on Phone ONLY */
         #flashcard-canvas {
-            background-color: #fdfdfd;
-            border: 1px solid #dde4ec;
-            border-radius: 10px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
             margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
             display: block;
             margin-left: auto;
             margin-right: auto;
-            max-width: 100%;
+            width: 100%;
+            max-width: 700px;
+            aspect-ratio: 2 / 1; /* Laptop / Desktop: 2:1 rectangle */
             height: auto;
         }
 
-        .controls, .feedback-btns {
+        /* Controls Containers */
+        .controls {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
@@ -165,69 +339,133 @@
             width: 100%;
             margin-top: 10px;
             margin-bottom: 10px;
+            gap: 8px;
         }
 
         /* Shared Button Styles */
-        .controls button, .feedback-btns button {
+        .controls button {
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 10px 18px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 0.95em;
             font-weight: 500;
-            margin: 6px;
-            min-width: 120px;
-            transition: transform 0.1s ease, box-shadow 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            font-family: 'Poppins', sans-serif;
+            margin: 4px;
+            min-width: 130px;
+            min-height: 44px;
+            transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+            font-family: inherit;
         }
 
-        .controls button:hover, .feedback-btns button:hover {
+        .controls button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.18);
         }
 
-        /* Hierarchy Groups */
-        .primary-group {
-            width: 100%;
+        /* Feedback Buttons Group: Fail & Pass side by side, Edit underneath */
+        .feedback-btns {
             display: flex;
-            justify-content: center;
-            margin-bottom: 5px;
-        }
-
-        .secondary-group {
+            flex-direction: column;
+            align-items: center;
             width: 100%;
+            gap: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .feedback-primary-row {
             display: flex;
+            width: 100%;
+            max-width: 600px;
+            gap: 12px;
             justify-content: center;
-            flex-wrap: wrap;
-            border-top: 1px dashed #dde4ec;
-            padding-top: 15px;
-            margin-top: 5px;
         }
 
-        /* Standard Controls Color Overrides (Only color!) */
-        #show-answer-btn, #export-btn, #add-gk-btn { 
-            background-color: #34495e; 
-            color: #fff;
-            min-width: 150px; 
+        .feedback-primary-row button {
+            flex: 1;
+            min-height: 48px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            font-family: inherit;
+            transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        #edit-gk-btn { background-color: #16a085; color: #fff; min-width: 90px; }
-        #load-more-btn { background-color: #8e44ad; display: none;} 
 
-        /* SRS Feedback Colors */
-        .btn-again { background-color: #e74c3c; } 
-        .btn-good { background-color: #27ae60; }  
+        .feedback-primary-row button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.22);
+        }
 
+        .feedback-secondary-row {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .feedback-secondary-row button {
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.92em;
+            font-weight: 500;
+            padding: 8px 24px;
+            min-height: 40px;
+            min-width: 140px;
+            font-family: inherit;
+            transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .feedback-secondary-row button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Button Colors */
+        #show-answer-btn { background-color: var(--btn-show-bg); min-width: 160px; font-weight: 600; }
+        #show-answer-btn:hover { background-color: var(--btn-show-hover); }
+        
+        #add-gk-btn { background-color: var(--btn-edit-bg); }
+        #add-gk-btn:hover { background-color: var(--btn-edit-hover); }
+
+        #sync-btn { background-color: var(--btn-sync-bg); font-weight: 600; }
+        #sync-btn:hover { background-color: var(--btn-sync-hover); }
+
+        #export-btn { background-color: var(--btn-export-bg); }
+        #export-btn:hover { background-color: var(--btn-export-hover); }
+
+        #load-more-btn { background-color: var(--btn-load-more-bg); display: none; }
+        #load-more-btn:hover { background-color: var(--btn-load-more-hover); }
+
+        .btn-again { background-color: var(--btn-fail-bg); }
+        .btn-again:hover { background-color: var(--btn-fail-hover); }
+
+        .btn-good { background-color: var(--btn-pass-bg); }
+        .btn-good:hover { background-color: var(--btn-pass-hover); }
+
+        #edit-gk-btn { background-color: var(--btn-edit-bg); }
+        #edit-gk-btn:hover { background-color: var(--btn-edit-hover); }
+
+        /* Notification Messages */
         #message-area {
             margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 10px 14px;
+            border-radius: 6px;
             font-weight: 500;
         }
-        .info-message { color: #2980b9; background-color: #eaf6ff; border: 1px solid #c2dcf2; }
-        .success-message { color: #27ae60; background-color: #e9f7ef; border: 1px solid #d4efdf; }
-        .error-message { color: #e74c3c; background-color: #fdedf0; border: 1px solid #fadbd8; }
+        .info-message { color: var(--msg-info-text); background-color: var(--msg-info-bg); border: 1px solid var(--msg-info-border); }
+        .success-message { color: var(--msg-success-text); background-color: var(--msg-success-bg); border: 1px solid var(--msg-success-border); }
+        .error-message { color: var(--msg-error-text); background-color: var(--msg-error-bg); border: 1px solid var(--msg-error-border); }
 
         /* Reusable Modal Styles */
         .modal {
@@ -238,44 +476,43 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
             justify-content: center;
             align-items: center;
         }
 
         .modal-content {
-            background-color: #fff;
-            padding: 20px;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            padding: 22px;
             border-radius: 12px;
             width: 90%;
             max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.3);
             text-align: left;
             animation: fadeIn 0.3s ease;
         }
 
         .modal-content h3 {
             margin-top: 0;
-            margin-bottom: 10px;
-            color: #2c3e50;
+            margin-bottom: 12px;
+            color: var(--text-primary);
         }
 
         .modal-content textarea {
             width: 100%;
-            height: 120px;
+            height: 130px;
             padding: 12px;
             margin-bottom: 15px;
             border-radius: 8px;
-            border: 1px solid #bdc3c7;
-            font-family: 'Poppins', sans-serif;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            font-family: inherit;
             font-size: 0.95em;
             resize: vertical;
-            box-sizing: border-box;
             outline: none;
-        }
-
-        .modal-content textarea:focus {
-            border-color: #3498db;
         }
 
         .modal-actions {
@@ -285,35 +522,75 @@
         }
 
         .modal-actions button {
-            padding: 8px 16px;
+            padding: 8px 18px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            font-family: 'Poppins', sans-serif;
+            font-family: inherit;
             color: white;
+            transition: all 0.2s ease;
         }
 
-        #btn-modal-save { background-color: #27ae60; }
-        #btn-modal-cancel { background-color: #95a5a6; }
+        #btn-modal-save { background-color: var(--btn-pass-bg); }
+        #btn-modal-save:hover { background-color: var(--btn-pass-hover); }
+        #btn-modal-cancel { background-color: #64748b; }
+        #btn-modal-cancel:hover { background-color: #475569; }
 
-        /* --- RESPONSIVE DESIGN ADDITIONS --- */
+        /* --- RESPONSIVE DESIGN (PHONE ONLY: SQUARE CANVAS) --- */
         input[type="file"] { width: 100%; }
         input[type="number"], select { max-width: 100%; }
         
         @media (max-width: 768px) {
-            .container { padding: 20px; width: 95%; }
-            .status-board { font-size: 1em; padding: 10px; }
+            .container { padding: 18px 24px; width: 95%; }
+            .status-board { font-size: 0.95em; padding: 10px; }
         }
 
-        @media (max-width: 480px) {
+        /* Mobile phones: Screen width 600px or less */
+        @media (max-width: 600px) {
             .container { padding: 12px 14px; }
-            h1 { font-size: 1.5em; margin-bottom: 10px; }
-            .status-board { font-size: 0.85em; padding: 8px; gap: 5px; justify-content: space-between; margin-bottom: 10px; }
+            h1 { font-size: 1.45em; margin-bottom: 10px; }
+            .setup-header h1 { font-size: 1.45em; }
+            
+            .status-board { 
+                font-size: 0.88em; 
+                padding: 8px 10px; 
+                gap: 5px; 
+                justify-content: space-between; 
+                margin-bottom: 12px; 
+            }
             .desktop-label { display: none; }
             .mobile-label { display: inline; }
+            
             #back-btn, #delete-btn { padding: 6px 12px; font-size: 0.9em; }
-            .controls button, .feedback-btns button { min-width: 45%; margin: 4px; padding: 8px 10px; font-size: 0.85em; }
+            .theme-toggle-btn { padding: 6px 10px; font-size: 0.95em; }
+
+            /* CANVAS IS SQUARE ON MOBILE ONLY */
+            #flashcard-canvas {
+                max-width: 480px;
+                aspect-ratio: 1 / 1; /* Pure 1:1 Square on Phone */
+            }
+
+            .controls button { 
+                min-width: 45%; 
+                margin: 3px; 
+                padding: 10px 10px; 
+                font-size: 0.88em; 
+                flex: 1;
+            }
+            #show-answer-btn { width: 100%; min-width: 100%; font-size: 1.05em; min-height: 48px; }
+
+            .feedback-primary-row {
+                gap: 10px;
+            }
+            .feedback-primary-row button {
+                min-height: 50px; /* Large touch target for thumbs */
+                font-size: 1.15em;
+            }
+            .feedback-secondary-row button {
+                width: 70%;
+                min-height: 42px;
+            }
         }
     </style>
 </head>
@@ -321,10 +598,13 @@
     <div class="container">
         
         <div id="setup-page">
-            <h1>Smart Flashcard Pro</h1>
+            <div class="setup-header">
+                <h1>Smart Flashcard Pro</h1>
+                <button id="setup-theme-toggle-btn" class="theme-toggle-btn" type="button" title="Toggle Dark/Light Mode">🌙</button>
+            </div>
 
             <div class="settings-panel" id="account-panel">
-                <h3 style="margin-top:0; color:#2c3e50;">Cloud Account</h3>
+                <h3 style="margin-top:0;">Cloud Account</h3>
                 <div id="auth-status" class="info-message" style="margin:0 0 12px;">Connect to your account to sync progress across devices.</div>
                 <div class="setting-group" style="border-bottom:none;">
                     <input type="email" id="auth-email" placeholder="Email address" autocomplete="username" style="flex:1; min-width:180px;">
@@ -350,7 +630,7 @@
                     <span class="setting-label">2. Hard Words Limits:</span>
                     <div style="display: flex; gap: 10px;">
                         <div style="text-align: center;">
-                            <label style="display:block; font-size:0.8em; color:#7f8c8d;">Count (Level < 2)</label>
+                            <label style="display:block; font-size:0.8em; color:var(--text-secondary);">Count (Level < 2)</label>
                             <input type="number" id="hard-words-count" value="20" min="5" max="200" style="width: 70px;">
                         </div>
                     </div>
@@ -360,7 +640,7 @@
                     <span class="setting-label">3. Winning Streak (Level 0):</span>
                     <div style="display: flex; gap: 10px;">
                         <div style="text-align: center;">
-                            <label style="display:block; font-size:0.8em; color:#7f8c8d;">Pass Target</label>
+                            <label style="display:block; font-size:0.8em; color:var(--text-secondary);">Pass Target</label>
                             <input type="number" id="streak-threshold" value="2" min="1" max="10" style="width: 70px;">
                         </div>
                     </div>
@@ -370,10 +650,10 @@
                     <span class="setting-label">4. Export Specific Score Cards:</span>
                     <div style="display: flex; gap: 10px; align-items: flex-end;">
                         <div>
-                            <label style="display:block; font-size:0.8em; color:#7f8c8d;">Score Below (<)</label>
+                            <label style="display:block; font-size:0.8em; color:var(--text-secondary);">Score Below (<)</label>
                             <input type="number" id="export-max-score" value="0" style="width: 70px;">
                         </div>
-                        <button id="export-low-score-btn" style="background-color: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; height: 38px;">Export .txt</button>
+                        <button id="export-low-score-btn" style="background-color: var(--btn-fail-bg); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; height: 38px;">Export .txt</button>
                     </div>
                 </div>
             </div>
@@ -386,7 +666,10 @@
             
             <div class="header-bar">
                 <button id="back-btn">⬅ Settings</button>
-                <button id="delete-btn" style="display: none;" title="Permanently delete this card">Delete 🗑️</button>
+                <div class="header-actions">
+                    <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" title="Toggle Dark/Light Mode">🌙</button>
+                    <button id="delete-btn" style="display: none;" title="Permanently delete this card">Delete 🗑️</button>
+                </div>
             </div>
             
             <div id="cloud-sync-status" class="info-message" style="margin:0 0 10px;">Cloud sync is ready when you sign in.</div>
@@ -413,15 +696,19 @@
             <div class="controls" id="main-controls" style="display: none;">
                 <button id="show-answer-btn">Show Answer 👀</button>
                 <button id="add-gk-btn">Add GK ➕</button>
-                <button id="sync-btn" style="background-color:#2471a3;">Save to Cloud ☁️</button>
+                <button id="sync-btn">Save to Cloud ☁️</button>
                 <button id="export-btn">Download Backup 💾</button>
                 <button id="load-more-btn">Load Next Chunk 🔄</button>
             </div>
 
             <div id="feedback-btns-2" class="feedback-btns" style="display: none;">
-                <button id="btn-fail" class="btn-again">Fail <br></button>
-                <button id="edit-gk-btn">Edit ✏️</button>
-                <button id="btn-pass" class="btn-good">Pass <br></button>
+                <div class="feedback-primary-row">
+                    <button id="btn-fail" class="btn-again">Fail</button>
+                    <button id="btn-pass" class="btn-good">Pass</button>
+                </div>
+                <div class="feedback-secondary-row">
+                    <button id="edit-gk-btn">Edit ✏️</button>
+                </div>
             </div>
         </div>
 

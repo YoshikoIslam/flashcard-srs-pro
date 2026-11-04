@@ -59,13 +59,73 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
             const modalInput = document.getElementById('modal-input');
             const btnModalSave = document.getElementById('btn-modal-save');
             const btnModalCancel = document.getElementById('btn-modal-cancel');
+            const themeToggleBtn = document.getElementById('theme-toggle-btn');
+            const setupThemeToggleBtn = document.getElementById('setup-theme-toggle-btn');
 
-            // --- Canvas Config ---
-            const FONT_PRIMARY = "bold 26px Poppins";
-            const FONT_SECONDARY = "500 20px Poppins";
-            const COLOR_Q = "#2c3e50";
-            const COLOR_A = "#27ae60";
-            const COLOR_HINT = "#7f8c8d";
+            // --- Canvas & Responsive Theme Config ---
+            function getTargetCanvasSize() {
+                const isMobile = window.innerWidth <= 600;
+                return isMobile ? { w: 480, h: 480 } : { w: 700, h: 350 };
+            }
+
+            function updateCanvasSize() {
+                const target = getTargetCanvasSize();
+                if (canvas.width !== target.w || canvas.height !== target.h) {
+                    canvas.width = target.w;
+                    canvas.height = target.h;
+                }
+            }
+
+            function getThemeColors() {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                return {
+                    isDark,
+                    q: isDark ? '#f8fafc' : '#2c3e50',
+                    a: isDark ? '#4ade80' : '#27ae60',
+                    hint: isDark ? '#94a3b8' : '#7f8c8d',
+                    divider: isDark ? '#334155' : '#dde4ec',
+                    cardBg: isDark ? '#1e293b' : '#fdfdfd'
+                };
+            }
+
+            function applyTheme(themeName) {
+                document.documentElement.setAttribute('data-theme', themeName);
+                try { localStorage.setItem('sfp_theme', themeName); } catch(e) {}
+                const isDark = themeName === 'dark';
+                const icon = isDark ? '☀️' : '🌙';
+                const title = isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+                if (themeToggleBtn) { themeToggleBtn.textContent = icon; themeToggleBtn.title = title; }
+                if (setupThemeToggleBtn) { setupThemeToggleBtn.textContent = icon; setupThemeToggleBtn.title = title; }
+                if (playerPage.style.display === 'block') {
+                    drawFlashcard();
+                }
+            }
+
+            function toggleTheme() {
+                const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+                applyTheme(current === 'dark' ? 'light' : 'dark');
+            }
+
+            if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
+            if (setupThemeToggleBtn) setupThemeToggleBtn.addEventListener('click', toggleTheme);
+
+            let initialTheme = 'light';
+            try {
+                initialTheme = localStorage.getItem('sfp_theme') || 
+                    (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            } catch(e) {}
+            applyTheme(initialTheme);
+
+            // Responsive Canvas Listener: purely visual redraw, never resets SRS progress or card queue
+            window.addEventListener('resize', () => {
+                const target = getTargetCanvasSize();
+                if (canvas.width !== target.w || canvas.height !== target.h) {
+                    updateCanvasSize();
+                    if (playerPage.style.display === 'block') {
+                        drawFlashcard();
+                    }
+                }
+            });
 
             // Tab Close Warning
             window.addEventListener('beforeunload', (e) => {
@@ -423,6 +483,9 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
                 // Hide card while editing for UX focus
                 if(mode === 'edit') {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const theme = getThemeColors();
+                    ctx.fillStyle = theme.cardBg;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
                 }
             }
 
@@ -850,71 +913,111 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
                 feedbackBtns2.style.display = 'flex';
             };
 
-            // --- Canvas Drawing ---
-            function wrapText(context, text, x, y, maxWidth, lineHeight, font, color) {
-                context.font = font;
+            // --- Canvas Drawing (Responsive & Bengali Diacritics Protected) ---
+            function wrapTextAutoFit(context, text, x, centerY, maxWidth, maxHeight, baseFontSize, fontWeight, color, minFontSize = 14) {
+                let fontSize = baseFontSize;
+                let lines = [];
+                let lineHeight = Math.round(fontSize * 1.48);
+
+                while (fontSize >= minFontSize) {
+                    context.font = `${fontWeight} ${fontSize}px 'Hind Siliguri', 'Poppins', sans-serif`;
+                    lineHeight = Math.round(fontSize * 1.48);
+                    const words = (text || "").toString().split(' ');
+                    lines = [];
+                    let currentLine = '';
+
+                    for (let i = 0; i < words.length; i++) {
+                        const testLine = currentLine ? (currentLine + ' ' + words[i]) : words[i];
+                        const metrics = context.measureText(testLine);
+                        if (metrics.width > maxWidth && currentLine) {
+                            lines.push(currentLine);
+                            currentLine = words[i];
+                        } else {
+                            currentLine = testLine;
+                        }
+                    }
+                    if (currentLine) {
+                        lines.push(currentLine);
+                    }
+
+                    const totalHeight = lines.length * lineHeight;
+                    if (totalHeight <= maxHeight || fontSize <= minFontSize) {
+                        break;
+                    }
+                    fontSize -= 2;
+                }
+
+                context.font = `${fontWeight} ${fontSize}px 'Hind Siliguri', 'Poppins', sans-serif`;
                 context.fillStyle = color;
                 context.textAlign = 'center';
                 context.textBaseline = 'middle';
 
-                let words = (text || "").toString().split(' ');
-                let line = '';
-                let currentY = y;
-                const lines = [];
-
-                for (let n = 0; n < words.length; n++) {
-                    let testLine = line + words[n] + ' ';
-                    let metrics = context.measureText(testLine);
-                    if (metrics.width > maxWidth && n > 0) {
-                        lines.push(line.trim());
-                        line = words[n] + ' ';
-                    } else {
-                        line = testLine;
-                    }
-                }
-                lines.push(line.trim());
-
                 const totalHeight = lines.length * lineHeight;
-                currentY = y - (totalHeight / 2) + (lineHeight / 2);
+                let currentY = centerY - (totalHeight / 2) + (lineHeight / 2);
 
-                lines.forEach(singleLine => {
-                    context.fillText(singleLine, x, currentY);
+                lines.forEach(line => {
+                    context.fillText(line, x, currentY);
                     currentY += lineHeight;
                 });
+
+                return { fontSize, lines, totalHeight };
             }
 
             function drawFlashcard() {
+                updateCanvasSize();
+                const theme = getThemeColors();
+
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
+                ctx.fillStyle = theme.cardBg;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
                 if (!currentItem) {
-                    ctx.fillStyle = COLOR_Q;
-                    ctx.font = FONT_PRIMARY;
+                    ctx.fillStyle = theme.q;
+                    ctx.font = `bold ${canvas.width > 500 ? '24px' : '20px'} 'Hind Siliguri', 'Poppins', sans-serif`;
                     ctx.textAlign = "center";
                     ctx.textBaseline = 'middle';
-                    ctx.fillText(flashcards.length === 0 ? "Setup Required!" : "Session chunk complete!", canvas.width/2, canvas.height/2);
+                    ctx.fillText(flashcards.length === 0 ? "Setup Required!" : "Session chunk complete!", canvas.width / 2, canvas.height / 2);
                     return;
                 }
 
-                ctx.fillStyle = COLOR_HINT;
-                ctx.font = "14px Poppins";
+                ctx.fillStyle = theme.hint;
+                ctx.font = "13px 'Hind Siliguri', 'Poppins', sans-serif";
                 ctx.textAlign = "left";
                 ctx.textBaseline = "alphabetic";
-                ctx.fillText("Mode: Question ➔ Answer", 20, 30);
+                ctx.fillText("Mode: Question ➔ Answer", 20, 26);
 
                 const qText = currentItem.question;
                 const aText = currentItem.answer;
+                const isSquare = (canvas.width === canvas.height);
+                const padX = isSquare ? 35 : 45;
+                const maxTextW = canvas.width - (padX * 2);
 
-                let qCenterY = isAnswerVisible ? canvas.height * 0.35 : canvas.height / 2;
-                wrapText(ctx, qText, canvas.width / 2, qCenterY, canvas.width - 80, 35, FONT_PRIMARY, COLOR_Q);
+                if (!isAnswerVisible) {
+                    const qBaseFont = isSquare ? 24 : 26;
+                    const qMaxH = canvas.height - 70;
+                    wrapTextAutoFit(ctx, qText, canvas.width / 2, canvas.height / 2, maxTextW, qMaxH, qBaseFont, "600", theme.q, 16);
+                } else {
+                    const dividerY = isSquare ? Math.round(canvas.height * 0.42) : Math.round(canvas.height * 0.48);
 
-                if (isAnswerVisible) {
+                    // Question in upper section
+                    const qCenterY = (35 + dividerY) / 2;
+                    const qMaxH = dividerY - 45;
+                    const qBaseFont = isSquare ? 21 : 23;
+                    wrapTextAutoFit(ctx, qText, canvas.width / 2, qCenterY, maxTextW, qMaxH, qBaseFont, "600", theme.q, 15);
+
+                    // Divider line
                     ctx.beginPath();
-                    ctx.moveTo(100, canvas.height / 2);
-                    ctx.lineTo(canvas.width - 100, canvas.height / 2);
-                    ctx.strokeStyle = "#ecf0f1";
+                    ctx.moveTo(35, dividerY);
+                    ctx.lineTo(canvas.width - 35, dividerY);
+                    ctx.strokeStyle = theme.divider;
+                    ctx.lineWidth = 1;
                     ctx.stroke();
 
-                    wrapText(ctx, aText, canvas.width / 2, canvas.height * 0.7, canvas.width - 80, 30, FONT_SECONDARY, COLOR_A);
+                    // Answer in lower section (starts at 23-24px, auto-shrinks if long)
+                    const aCenterY = (dividerY + canvas.height) / 2;
+                    const aMaxH = canvas.height - dividerY - 30;
+                    const aBaseFont = isSquare ? 23 : 22;
+                    wrapTextAutoFit(ctx, aText, canvas.width / 2, aCenterY, maxTextW, aMaxH, aBaseFont, "500", theme.a, 14);
                 }
             }
 
@@ -956,7 +1059,11 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
             };
 
             // Start screen init
+            updateCanvasSize();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const initTheme = getThemeColors();
+            ctx.fillStyle = initTheme.cardBg;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // --- Export Low Score Cards Functionality ---
             const exportLowScoreBtn = document.getElementById('export-low-score-btn');
