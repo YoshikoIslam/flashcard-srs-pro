@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Flashcard Pro - TXT Edition</title>
+    <title>Smart Flashcard Pro - Multi Database Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -49,6 +49,8 @@
             --btn-back-hover: #bdc3c7;
             --btn-delete-bg: #e74c3c;
             --btn-delete-hover: #c0392b;
+            --btn-create-bg: #8e44ad;
+            --btn-create-hover: #7d3c98;
             
             --theme-toggle-bg: #f1f5f9;
             --theme-toggle-border: #cbd5e1;
@@ -106,6 +108,8 @@
             --btn-back-hover: #334155;
             --btn-delete-bg: #dc2626;
             --btn-delete-hover: #b91c1c;
+            --btn-create-bg: #9333ea;
+            --btn-create-hover: #7e22ce;
             
             --theme-toggle-bg: #1e293b;
             --theme-toggle-border: #475569;
@@ -122,35 +126,18 @@
             --msg-error-border: rgba(248, 113, 113, 0.28);
         }
 
-        * {
-            box-sizing: border-box;
-            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-        }
+        * { box-sizing: border-box; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
 
         body {
-            font-family: 'Noto Sans Bengali', 'Poppins', sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            min-height: 100vh;
-            background: var(--bg-gradient);
-            margin: 0;
-            padding-top: 15px;
-            padding-bottom: 25px;
-            color: var(--text-body);
+            font-family: 'Noto Sans Bengali', 'Poppins', sans-serif; display: flex; flex-direction: column;
+            justify-content: flex-start; align-items: center; min-height: 100vh;
+            background: var(--bg-gradient); margin: 0; padding-top: 15px; padding-bottom: 25px; color: var(--text-body);
         }
 
         .container {
-            background-color: var(--container-bg);
-            padding: 20px 40px;
-            border-radius: 14px;
-            box-shadow: var(--container-shadow);
-            text-align: center;
-            width: 90%;
-            max-width: 800px;
-            animation: fadeIn 0.4s ease-out;
-            position: relative;
+            background-color: var(--container-bg); padding: 20px 40px; border-radius: 14px;
+            box-shadow: var(--container-shadow); text-align: center; width: 90%; max-width: 800px;
+            animation: fadeIn 0.4s ease-out; position: relative;
         }
 
         @keyframes fadeIn {
@@ -158,442 +145,128 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .setup-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .setup-header h1 {
-            color: var(--text-primary);
-            margin: 0;
-            font-size: 1.85em;
-            text-align: left;
-        }
-
+        .setup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .setup-header h1 { color: var(--text-primary); margin: 0; font-size: 1.85em; text-align: left; }
         h1 { color: var(--text-primary); margin-top: 0; margin-bottom: 15px; font-size: 2em; }
         h3 { color: var(--text-primary); }
+        h4 { color: var(--text-primary); margin-top: 10px; margin-bottom: 10px; text-align: left; font-size: 1.1em;}
 
-        /* Setup Page Styles */
-        .settings-panel {
-            background-color: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
-            text-align: left;
-        }
-
-        .setting-group {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px dashed var(--border-dashed);
-        }
+        .settings-panel { background-color: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 10px; padding: 20px; margin-bottom: 15px; text-align: left; }
+        .setting-group { margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding-bottom: 10px; border-bottom: 1px dashed var(--border-dashed); }
         .setting-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-
         .setting-label { font-weight: 600; color: var(--text-primary); }
 
-        input[type="email"], input[type="password"], input[type="number"], input[type="file"], select {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid var(--input-border);
-            font-family: inherit;
-            font-size: 0.95em;
-            background-color: var(--input-bg);
-            color: var(--text-primary);
-            box-sizing: border-box;
-            outline: none;
+        input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="file"], select {
+            padding: 8px 12px; border-radius: 6px; border: 1px solid var(--input-border);
+            font-family: inherit; font-size: 0.95em; background-color: var(--input-bg);
+            color: var(--text-primary); box-sizing: border-box; outline: none;
         }
 
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--focus-ring);
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
-        }
+        input:focus, select:focus, textarea:focus { border-color: var(--focus-ring); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25); }
         
         #start-learning-btn {
-            background-color: var(--btn-pass-bg);
-            color: white;
-            font-size: 1.2em;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            width: 100%;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 6px rgba(39, 174, 96, 0.2);
-            font-family: inherit;
+            background-color: var(--btn-pass-bg); color: white; font-size: 1.2em; padding: 12px 30px;
+            border: none; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%;
+            transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(39, 174, 96, 0.2); font-family: inherit;
         }
         #start-learning-btn:hover:not(:disabled) { background-color: var(--btn-pass-hover); transform: translateY(-2px); }
         #start-learning-btn:disabled { background-color: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.6; }
 
-        /* Player Page Styles */
-        .header-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 12px;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .header-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px; }
+        .header-actions { display: flex; align-items: center; gap: 8px; }
 
         .theme-toggle-btn {
-            background-color: var(--theme-toggle-bg);
-            border: 1px solid var(--theme-toggle-border);
-            color: var(--text-primary);
-            padding: 7px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.05em;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
+            background-color: var(--theme-toggle-bg); border: 1px solid var(--theme-toggle-border); color: var(--text-primary);
+            padding: 7px 12px; border-radius: 8px; cursor: pointer; font-size: 1.05em; display: inline-flex;
+            align-items: center; justify-content: center; transition: all 0.2s ease;
         }
-        .theme-toggle-btn:hover {
-            background-color: var(--theme-toggle-hover);
-            transform: translateY(-1px);
-        }
+        .theme-toggle-btn:hover { background-color: var(--theme-toggle-hover); transform: translateY(-1px); }
 
-        #back-btn {
-            background-color: var(--btn-back-bg);
-            color: var(--btn-back-text);
-            border: 1px solid var(--border-color);
-            padding: 8px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-family: inherit;
-            transition: all 0.2s ease;
-        }
+        #back-btn { background-color: var(--btn-back-bg); color: var(--btn-back-text); border: 1px solid var(--border-color); padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; transition: all 0.2s ease; }
         #back-btn:hover { background-color: var(--btn-back-hover); color: var(--text-primary); }
 
-        #delete-btn {
-            background-color: var(--btn-delete-bg);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-family: inherit;
-            transition: all 0.2s ease;
-        }
+        #delete-btn { background-color: var(--btn-delete-bg); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; transition: all 0.2s ease; }
         #delete-btn:hover { background-color: var(--btn-delete-hover); transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        .status-board {
-            font-size: 1.05em;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            color: var(--status-text);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 12px;
-            background-color: var(--status-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-weight: 600;
-        }
-        
-        #due-count, #total-due, #total-count { 
-            color: var(--stat-highlight); 
-        }
-
+        .status-board { font-size: 1.05em; margin-top: 5px; margin-bottom: 15px; color: var(--status-text); display: flex; justify-content: space-around; align-items: center; padding: 12px; background-color: var(--status-bg); border: 1px solid var(--border-color); border-radius: 8px; font-weight: 600; }
+        #due-count, #total-due, #total-count { color: var(--stat-highlight); }
         .mobile-label { display: none; }
         .desktop-label { display: inline; }
 
-        /* Canvas: Rectangular 2:1 on Laptop/Desktop, Square 1:1 on Phone ONLY */
-        #flashcard-canvas {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            width: 100%;
-            max-width: 700px;
-            aspect-ratio: 2 / 1; /* Laptop / Desktop: 2:1 rectangle */
-            height: auto;
-        }
+        #flashcard-canvas { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08); display: block; margin-left: auto; margin-right: auto; width: 100%; max-width: 700px; aspect-ratio: 2 / 1; height: auto; }
 
-        /* Controls Containers */
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            margin-top: 10px;
-            margin-bottom: 10px;
-            gap: 8px;
-        }
+        .controls { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; width: 100%; margin-top: 10px; margin-bottom: 10px; gap: 8px; }
+        .controls button { color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 0.95em; font-weight: 500; margin: 4px; min-width: 130px; min-height: 44px; transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.12); font-family: inherit; }
+        .controls button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.18); }
 
-        /* Shared Button Styles */
-        .controls button {
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.95em;
-            font-weight: 500;
-            margin: 4px;
-            min-width: 130px;
-            min-height: 44px;
-            transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.12);
-            font-family: inherit;
-        }
+        .feedback-btns { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 10px; margin-top: 10px; margin-bottom: 10px; }
+        .feedback-primary-row { display: flex; width: 100%; max-width: 600px; gap: 12px; justify-content: center; }
+        .feedback-primary-row button { flex: 1; min-height: 48px; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1em; font-weight: 600; font-family: inherit; transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease; box-shadow: 0 3px 8px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; }
+        .feedback-primary-row button:hover { transform: translateY(-2px); box-shadow: 0 5px 12px rgba(0,0,0,0.22); }
+        .feedback-secondary-row { display: flex; width: 100%; justify-content: center; }
+        .feedback-secondary-row button { color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.92em; font-weight: 500; padding: 8px 24px; min-height: 40px; min-width: 140px; font-family: inherit; transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .feedback-secondary-row button:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
 
-        .controls button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.18);
-        }
-
-        /* Feedback Buttons Group: Fail & Pass side by side, Edit underneath */
-        .feedback-btns {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            gap: 10px;
-            margin-top: 10px;
-            margin-bottom: 10px;
-        }
-
-        .feedback-primary-row {
-            display: flex;
-            width: 100%;
-            max-width: 600px;
-            gap: 12px;
-            justify-content: center;
-        }
-
-        .feedback-primary-row button {
-            flex: 1;
-            min-height: 48px;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: 600;
-            font-family: inherit;
-            transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .feedback-primary-row button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 12px rgba(0,0,0,0.22);
-        }
-
-        .feedback-secondary-row {
-            display: flex;
-            width: 100%;
-            justify-content: center;
-        }
-
-        .feedback-secondary-row button {
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.92em;
-            font-weight: 500;
-            padding: 8px 24px;
-            min-height: 40px;
-            min-width: 140px;
-            font-family: inherit;
-            transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .feedback-secondary-row button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-        }
-
-        /* Button Colors */
         #show-answer-btn { background-color: var(--btn-show-bg); min-width: 160px; font-weight: 600; }
         #show-answer-btn:hover { background-color: var(--btn-show-hover); }
-        
         #add-gk-btn { background-color: var(--btn-edit-bg); }
         #add-gk-btn:hover { background-color: var(--btn-edit-hover); }
-
         #sync-btn { background-color: var(--btn-sync-bg); font-weight: 600; }
         #sync-btn:hover { background-color: var(--btn-sync-hover); }
-
         #export-btn { background-color: var(--btn-export-bg); }
         #export-btn:hover { background-color: var(--btn-export-hover); }
-
         #load-more-btn { background-color: var(--btn-load-more-bg); display: none; }
         #load-more-btn:hover { background-color: var(--btn-load-more-hover); }
-
         .btn-again { background-color: var(--btn-fail-bg); }
         .btn-again:hover { background-color: var(--btn-fail-hover); }
-
         .btn-good { background-color: var(--btn-pass-bg); }
         .btn-good:hover { background-color: var(--btn-pass-hover); }
-
         #edit-gk-btn { background-color: var(--btn-edit-bg); }
         #edit-gk-btn:hover { background-color: var(--btn-edit-hover); }
 
-        /* Notification Messages */
-        #message-area {
-            margin-top: 15px;
-            padding: 10px 14px;
-            border-radius: 6px;
-            font-weight: 500;
-        }
+        #message-area { margin-top: 15px; padding: 10px 14px; border-radius: 6px; font-weight: 500; }
         .info-message { color: var(--msg-info-text); background-color: var(--msg-info-bg); border: 1px solid var(--msg-info-border); }
         .success-message { color: var(--msg-success-text); background-color: var(--msg-success-bg); border: 1px solid var(--msg-success-border); }
         .error-message { color: var(--msg-error-text); background-color: var(--msg-error-bg); border: 1px solid var(--msg-error-border); }
 
-        /* Reusable Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(2px);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: var(--container-bg);
-            border: 1px solid var(--border-color);
-            padding: 22px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.3);
-            text-align: left;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content h3 {
-            margin-top: 0;
-            margin-bottom: 12px;
-            color: var(--text-primary);
-        }
-
-        .modal-content textarea {
-            width: 100%;
-            height: 130px;
-            padding: 12px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--input-border);
-            background-color: var(--input-bg);
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 0.95em;
-            resize: vertical;
-            outline: none;
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        .modal-actions button {
-            padding: 8px 18px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-family: inherit;
-            color: white;
-            transition: all 0.2s ease;
-        }
-
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px); justify-content: center; align-items: center; }
+        .modal-content { background-color: var(--container-bg); border: 1px solid var(--border-color); padding: 22px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 12px 35px rgba(0,0,0,0.3); text-align: left; animation: fadeIn 0.3s ease; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 12px; color: var(--text-primary); }
+        .modal-content textarea { width: 100%; height: 130px; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--text-primary); font-family: inherit; font-size: 0.95em; resize: vertical; outline: none; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+        .modal-actions button { padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; color: white; transition: all 0.2s ease; }
         #btn-modal-save { background-color: var(--btn-pass-bg); }
         #btn-modal-save:hover { background-color: var(--btn-pass-hover); }
         #btn-modal-cancel { background-color: #64748b; }
         #btn-modal-cancel:hover { background-color: #475569; }
 
-        /* --- RESPONSIVE DESIGN (PHONE ONLY: SQUARE CANVAS) --- */
         input[type="file"] { width: 100%; }
         input[type="number"], select { max-width: 100%; }
         
+        .db-action-btn { background: none; border: none; font-size: 1.1em; cursor: pointer; padding: 4px; border-radius: 4px; color: var(--text-secondary); transition: all 0.2s ease; min-width: 0; min-height: 0; box-shadow: none; margin: 0; }
+        .db-action-btn:hover { color: var(--text-primary); background-color: var(--border-color); transform: none; box-shadow: none; }
+
         @media (max-width: 768px) {
             .container { padding: 18px 24px; width: 95%; }
             .status-board { font-size: 0.95em; padding: 10px; }
         }
-
-        /* Mobile phones: Screen width 600px or less */
         @media (max-width: 600px) {
             .container { padding: 12px 14px; }
             h1 { font-size: 1.45em; margin-bottom: 10px; }
             .setup-header h1 { font-size: 1.45em; }
-            
-            .status-board { 
-                font-size: 0.88em; 
-                padding: 8px 10px; 
-                gap: 5px; 
-                justify-content: space-between; 
-                margin-bottom: 12px; 
-            }
+            .status-board { font-size: 0.88em; padding: 8px 10px; gap: 5px; justify-content: space-between; margin-bottom: 12px; }
             .desktop-label { display: none; }
             .mobile-label { display: inline; }
-            
             #back-btn, #delete-btn { padding: 6px 12px; font-size: 0.9em; }
             .theme-toggle-btn { padding: 6px 10px; font-size: 0.95em; }
-
-            /* CANVAS IS SQUARE ON MOBILE ONLY */
-            #flashcard-canvas {
-                max-width: 480px;
-                aspect-ratio: 1 / 1; /* Pure 1:1 Square on Phone */
-            }
-
-            .controls button { 
-                min-width: 45%; 
-                margin: 3px; 
-                padding: 10px 10px; 
-                font-size: 0.88em; 
-                flex: 1;
-            }
+            #flashcard-canvas { max-width: 480px; aspect-ratio: 1 / 1; }
+            .controls button { min-width: 45%; margin: 3px; padding: 10px 10px; font-size: 0.88em; flex: 1; }
             #show-answer-btn { width: 100%; min-width: 100%; font-size: 1.05em; min-height: 48px; }
-
-            .feedback-primary-row {
-                gap: 10px;
-            }
-            .feedback-primary-row button {
-                min-height: 50px; /* Large touch target for thumbs */
-                font-size: 1.15em;
-            }
-            .feedback-secondary-row button {
-                width: 70%;
-                min-height: 42px;
-            }
+            .feedback-primary-row { gap: 10px; }
+            .feedback-primary-row button { min-height: 50px; font-size: 1.15em; }
+            .feedback-secondary-row button { width: 70%; min-height: 42px; }
         }
     </style>
-    <!-- Robust Standalone Theme Handler: Works instantly even on file:// or before external modules load -->
     <script>
         function applyAppTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
@@ -618,7 +291,6 @@
             applyAppTheme(next);
         }
 
-        // Apply immediately to prevent theme flash
         (function() {
             var saved = 'light';
             try {
@@ -661,26 +333,39 @@
                 <div id="auth-feedback" aria-live="polite" style="font-size:0.9em; margin-top:8px;"></div>
             </div>
             
-            <div class="settings-panel">
+            <div class="settings-panel" id="personal-db-panel" style="display: none; border: 1px solid var(--focus-ring);">
+                <h3 style="margin-top:0;">Create Personal Database</h3>
                 <div class="setting-group">
-                    <span class="setting-label">1. Select Database:</span>
-                    <select id="deck-select" disabled style="min-width:220px; flex:1;">
-                        <option value="">Login to load datasets...</option>
-                    </select>
+                    <input type="text" id="create-db-name" placeholder="Enter Database Name..." style="flex:1; min-width:200px;">
                 </div>
-
-                <div class="setting-group">
-                    <span class="setting-label">2. Hard Words Limits:</span>
-                    <div style="display: flex; gap: 10px;">
-                        <div style="text-align: center;">
-                            <label style="display:block; font-size:0.8em; color:var(--text-secondary);">Count (Level < 2)</label>
-                            <input type="number" id="hard-words-count" value="20" min="5" max="200" style="width: 70px;">
-                        </div>
+                <div class="setting-group" style="align-items: flex-start; border-bottom: none; margin-bottom: 0;">
+                    <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+                        <input type="file" id="create-db-file" accept=".txt">
+                        <span style="font-size: 0.85em; text-align: center; color: var(--text-secondary);">— OR —</span>
+                        <textarea id="create-db-text" placeholder="Paste TXT content here (Question > Answer...)" style="height: 80px; resize: vertical;"></textarea>
                     </div>
                 </div>
+                <div id="create-db-feedback" aria-live="polite" style="font-size:0.9em; margin-top:10px; margin-bottom:10px;"></div>
+                <div class="controls" style="margin:0; justify-content:flex-end;">
+                    <button type="button" id="create-db-btn" style="background:var(--btn-create-bg);">Create Database</button>
+                </div>
+            </div>
 
+            <div class="settings-panel">
+                <div class="setting-group" style="border-bottom:none; padding-bottom:0;">
+                    <span class="setting-label">1. Select Databases & Hard Limits:</span>
+                    <div style="width:100%; display:flex; justify-content:flex-end; margin-top:5px;">
+                        <button type="button" id="browse-catalogue-btn" style="background:var(--btn-edit-bg); color:white; border:none; padding:6px 12px; border-radius:6px; font-size:0.85em; cursor:pointer; display:none;">Browse Built-in Databases</button>
+                    </div>
+                    <div id="deck-list-container" style="width:100%; margin-top:10px;">
+                        <p style="font-size:0.9em; color:var(--text-secondary);">Login to load datasets...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-panel">
                 <div class="setting-group">
-                    <span class="setting-label">3. Winning Streak (Level 0):</span>
+                    <span class="setting-label">2. Winning Streak (Level 0):</span>
                     <div style="display: flex; gap: 10px;">
                         <div style="text-align: center;">
                             <label style="display:block; font-size:0.8em; color:var(--text-secondary);">Pass Target</label>
@@ -690,7 +375,7 @@
                 </div>
 
                 <div class="setting-group">
-                    <span class="setting-label">4. Export Specific Score Cards:</span>
+                    <span class="setting-label">3. Export Specific Score Cards:</span>
                     <div style="display: flex; gap: 10px; align-items: flex-end;">
                         <div>
                             <label style="display:block; font-size:0.8em; color:var(--text-secondary);">Score Below (<)</label>
@@ -701,8 +386,8 @@
                 </div>
             </div>
 
-            <button id="start-learning-btn" disabled>Upload Database to Start 🚀</button>
-            <div id="message-area" class="info-message">Upload your .txt file (Format: Qstn &gt; Ans &gt; Lvl &gt; Score).</div>
+            <button id="start-learning-btn" disabled>Select Database to Start 🚀</button>
+            <div id="message-area" class="info-message">Select one or multiple databases to start your session.</div>
         </div>
 
         <div id="player-page" style="display: none;">
@@ -757,13 +442,29 @@
 
     </div>
 
+    <!-- Modals -->
     <div id="gk-modal" class="modal">
         <div class="modal-content">
             <h3 id="modal-title">Add / Edit GK</h3>
+            <div id="modal-deck-select-container" style="margin-bottom: 12px; display: none;">
+                <label style="font-size:0.9em; font-weight:600; color:var(--text-primary);">Select Target Database:</label>
+                <select id="modal-deck-select" style="margin-top: 5px; width: 100%; padding:8px; border-radius:6px; background-color:var(--input-bg); color:var(--text-primary);"></select>
+            </div>
             <textarea id="modal-input" placeholder="Question > Answer (Example: দক্ষিণ আমেরিকার সবচেয়ে উত্তরের দেশ কোনটি > কলম্বো)"></textarea>
             <div class="modal-actions">
                 <button id="btn-modal-cancel">Cancel</button>
                 <button id="btn-modal-save">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="rename-modal" class="modal">
+        <div class="modal-content">
+            <h3>Rename Personal Database</h3>
+            <input type="text" id="rename-input" placeholder="New Database Name..." style="margin-bottom:15px;">
+            <div class="modal-actions">
+                <button id="btn-rename-cancel">Cancel</button>
+                <button id="btn-rename-save">Rename</button>
             </div>
         </div>
     </div>
