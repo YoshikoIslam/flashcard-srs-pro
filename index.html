@@ -240,6 +240,39 @@
         #btn-modal-cancel { background-color: #64748b; }
         #btn-modal-cancel:hover { background-color: #475569; }
 
+        /* Winning Streak Toggle Styles */
+        .streak-toggle-container {
+            display: flex;
+            background-color: var(--status-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 5px;
+            gap: 6px;
+            margin: 16px 0;
+        }
+        .streak-toggle-btn {
+            flex: 1;
+            padding: 12px 10px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1.05em;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: transparent;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+        .streak-toggle-btn:hover:not(.active) {
+            color: var(--text-primary);
+            background-color: var(--border-color);
+        }
+        .streak-toggle-btn.active {
+            background-color: var(--btn-pass-bg);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+        }
+
         input[type="file"] { width: 100%; }
         input[type="number"], select { max-width: 100%; }
         
@@ -461,10 +494,43 @@
     <div id="rename-modal" class="modal">
         <div class="modal-content">
             <h3>Rename Personal Database</h3>
-            <input type="text" id="rename-input" placeholder="New Database Name..." style="margin-bottom:15px;">
+            <input type="text" id="rename-input" placeholder="New Database Name..." style="margin-bottom:15px; width:100%;">
             <div class="modal-actions">
-                <button id="btn-rename-cancel">Cancel</button>
-                <button id="btn-rename-save">Rename</button>
+                <button id="btn-rename-cancel" style="background-color:#64748b;">Cancel</button>
+                <button id="btn-rename-save" style="background-color:var(--btn-pass-bg);">Rename</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Winning Streak Toggle Modal (2 vs 3) -->
+    <div id="streak-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <h3>Select Winning Streak 🎯</h3>
+            <p style="font-size: 0.9em; color: var(--text-secondary); margin-top: 0;">Level 0 কার্ড পাস করার টার্গেট সিলেক্ট করুন:</p>
+            <div class="streak-toggle-container">
+                <button type="button" class="streak-toggle-btn active" data-streak="2">2 Streak</button>
+                <button type="button" class="streak-toggle-btn" data-streak="3">3 Streak</button>
+            </div>
+            <div class="modal-actions" style="justify-content: center; margin-top: 18px;">
+                <button type="button" id="btn-streak-cancel" style="background-color: #64748b;">Cancel</button>
+                <button type="button" id="btn-streak-confirm" style="background-color: var(--btn-pass-bg);">Start Session 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Edit All Questions & Answers Modal -->
+    <div id="bulk-edit-modal" class="modal">
+        <div class="modal-content" style="max-width: 720px; width: 94%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3 id="bulk-edit-title" style="margin: 0;">Edit Database Q&A 📝</h3>
+                <span id="bulk-edit-count" style="font-size: 0.85em; color: var(--text-secondary); font-weight: 600;">0 cards</span>
+            </div>
+            <p style="font-size: 0.82em; color: var(--text-secondary); margin: 0 0 10px;">প্রতি লাইনে একটি করে <b>Question &gt; Answer</b> ফরম্যাটে এডিট করুন (আগের কার্ডগুলোর SRS প্রোগ্রেস অক্ষুণ্ণ থাকবে):</p>
+            <textarea id="bulk-edit-textarea" placeholder="Loading cards..." style="height: 360px; line-height: 1.55;"></textarea>
+            <div id="bulk-edit-status" style="font-size: 0.88em; margin-bottom: 10px; min-height: 18px;"></div>
+            <div class="modal-actions">
+                <button type="button" id="btn-bulk-cancel" style="background-color: #64748b;">Cancel</button>
+                <button type="button" id="btn-bulk-save" style="background-color: var(--btn-pass-bg);">Save All Changes 💾</button>
             </div>
         </div>
     </div>
