@@ -24,12 +24,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     let globalTotalDue = 0;
     let pendingSaves = []; 
     let deckToRename = null;
+    let selectedWinningStreak = 2;
+    let bulkEditingDeck = null;
+    let bulkOriginalCards = [];
 
     const setupPage = document.getElementById('setup-page');
     const deckListContainer = document.getElementById('deck-list-container');
     const startLearningBtn = document.getElementById('start-learning-btn');
     const messageArea = document.getElementById('message-area');
     const browseCatalogueBtn = document.getElementById('browse-catalogue-btn');
+    const streakThresholdInput = document.getElementById('streak-threshold');
     
     const authEmail = document.getElementById('auth-email');
     const authPassword = document.getElementById('auth-password');
@@ -73,6 +77,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     const renameInput = document.getElementById('rename-input');
     const btnRenameCancel = document.getElementById('btn-rename-cancel');
     const btnRenameSave = document.getElementById('btn-rename-save');
+
+    // Winning Streak Modal Elements
+    const streakModal = document.getElementById('streak-modal');
+    const btnStreakCancel = document.getElementById('btn-streak-cancel');
+    const btnStreakConfirm = document.getElementById('btn-streak-confirm');
+    const streakToggleBtns = document.querySelectorAll('.streak-toggle-btn');
+
+    // Bulk Edit Modal Elements
+    const bulkEditModal = document.getElementById('bulk-edit-modal');
+    const bulkEditTitle = document.getElementById('bulk-edit-title');
+    const bulkEditCount = document.getElementById('bulk-edit-count');
+    const bulkEditTextarea = document.getElementById('bulk-edit-textarea');
+    const bulkEditStatus = document.getElementById('bulk-edit-status');
+    const btnBulkCancel = document.getElementById('btn-bulk-cancel');
+    const btnBulkSave = document.getElementById('btn-bulk-save');
+
+    function syncStreakToggleUI(val) {
+        selectedWinningStreak = val;
+        if (streakThresholdInput) streakThresholdInput.value = val;
+        streakToggleBtns.forEach(btn => {
+            btn.classList.toggle('active', Number(btn.dataset.streak) === val);
+        });
+    }
+
+    streakToggleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            syncStreakToggleUI(Number(btn.dataset.streak));
+        });
+    });
+
+    if (streakThresholdInput) {
+        streakThresholdInput.addEventListener('change', () => {
+            const val = parseInt(streakThresholdInput.value) || 2;
+            selectedWinningStreak = val;
+            streakToggleBtns.forEach(btn => {
+                btn.classList.toggle('active', Number(btn.dataset.streak) === val);
+            });
+        });
+    }
 
     function getTargetCanvasSize() {
         const isMobile = window.innerWidth <= 600;
@@ -148,7 +191,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // --- CRITICAL FIX 1: Provide cardToCloudRow ---
     function cardToCloudRow(card) {
         return {
             id: card.id || crypto.randomUUID(),
@@ -178,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 availableDecks.push({
                     id: ud.deck_key,
                     name: ud.deck_name,
-                    file: 'personal', // It is authoritative in Supabase
+                    file: 'personal',
                     isCustom: ud.deck_key.startsWith('custom:')
                 });
             });
@@ -241,6 +283,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             row.style.border = '1px solid var(--border-color)';
             row.style.borderRadius = '8px';
             row.style.backgroundColor = 'var(--input-bg)';
+            row.style.flexWrap = 'wrap';
+            row.style.gap = '8px';
             
             const leftDiv = document.createElement('div');
             leftDiv.style.display = 'flex';
@@ -256,7 +300,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             checkbox.style.width = '18px';
             checkbox.style.height = '18px';
             
-            // Re-check previously selected items
             if (selectedDecks.some(sd => sd.id === deck.id)) {
                 checkbox.checked = true;
             }
@@ -273,15 +316,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             leftDiv.appendChild(checkbox);
             leftDiv.appendChild(label);
+
+            // Bulk Edit Q&A Button for ALL databases
+            const bulkEditBtn = document.createElement('button');
+            bulkEditBtn.type = 'button';
+            bulkEditBtn.className = 'db-action-btn';
+            bulkEditBtn.innerHTML = '📝';
+            bulkEditBtn.title = 'Edit All Questions & Answers';
+            bulkEditBtn.style.marginLeft = '8px';
+            bulkEditBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openBulkEditModal(deck);
+            };
+            leftDiv.appendChild(bulkEditBtn);
             
             if (deck.isCustom) {
                 const editBtn = document.createElement('button');
+                editBtn.type = 'button';
                 editBtn.className = 'db-action-btn';
                 editBtn.innerHTML = '✏️';
                 editBtn.title = 'Rename Database';
-                editBtn.style.marginLeft = '8px';
+                editBtn.style.marginLeft = '4px';
                 editBtn.onclick = (e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     deckToRename = deck;
                     renameInput.value = deck.name;
                     renameModal.style.display = 'flex';
@@ -289,19 +348,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 leftDiv.appendChild(editBtn);
                 
                 const delDbBtn = document.createElement('button');
+                delDbBtn.type = 'button';
                 delDbBtn.className = 'db-action-btn';
                 delDbBtn.innerHTML = '🗑️';
                 delDbBtn.title = 'Delete Database';
                 delDbBtn.style.marginLeft = '4px';
                 delDbBtn.onclick = async (e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     if (playerPage.style.display === 'block') {
                         alert("Cannot delete a database while a practice session is active. Please return to settings first.");
                         return;
                     }
                     if (confirm(`Are you sure you want to completely delete "${deck.name}" and ALL its flashcards? This cannot be undone.`)) {
                         try {
-                            // CRITICAL FIX 4: Safe Sequential Deletion (Cards then Metadata)
                             const { error: e1 } = await supabase.from('user_flashcards').delete()
                                 .eq('user_id', currentUser.id).eq('deck_key', deck.id);
                             if(e1) throw e1;
@@ -311,7 +371,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                             if(e2) throw e2;
                             
                             alert("Database deleted successfully.");
-                            // Remove from selected list to prevent issues
                             selectedDecks = selectedDecks.filter(sd => sd.id !== deck.id);
                             await fetchUserDecks();
                         } catch(err) {
@@ -385,6 +444,196 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // --- Bulk Edit Modal Logic (All Questions & Answers in a Deck) ---
+    async function openBulkEditModal(deck) {
+        if (!currentUser) return;
+        bulkEditingDeck = deck;
+        bulkOriginalCards = [];
+        bulkEditTitle.textContent = `Edit: ${deck.name} 📝`;
+        bulkEditCount.textContent = 'Loading...';
+        bulkEditTextarea.value = '';
+        bulkEditTextarea.disabled = true;
+        btnBulkSave.disabled = true;
+        bulkEditStatus.textContent = 'Fetching cards from database...';
+        bulkEditStatus.style.color = 'var(--text-secondary)';
+        bulkEditModal.style.display = 'flex';
+
+        try {
+            // Ensure built-in decks are imported into Supabase first
+            await importDeckForUserIfNeeded(deck);
+
+            let fetchedCards = [];
+            let fetchLimit = 1000;
+            let fetchOffset = 0;
+            let hasMore = true;
+
+            while (hasMore) {
+                const { data: pageCards, error } = await supabase.from('user_flashcards')
+                    .select('id,deck_key,question,answer,level,score,next_review,pass_streak,new_consecutive')
+                    .eq('user_id', currentUser.id)
+                    .eq('deck_key', deck.id)
+                    .order('id', { ascending: true })
+                    .range(fetchOffset, fetchOffset + fetchLimit - 1);
+
+                if (error) throw error;
+                if (pageCards && pageCards.length > 0) {
+                    fetchedCards.push(...pageCards);
+                    fetchOffset += fetchLimit;
+                    if (pageCards.length < fetchLimit) hasMore = false;
+                } else {
+                    hasMore = false;
+                }
+            }
+
+            bulkOriginalCards = fetchedCards;
+            bulkEditTextarea.value = fetchedCards.map(c => `${c.question} > ${c.answer}`).join('\n');
+            bulkEditCount.textContent = `${fetchedCards.length} cards`;
+            bulkEditStatus.textContent = '';
+            bulkEditTextarea.disabled = false;
+            btnBulkSave.disabled = false;
+            bulkEditTextarea.focus();
+        } catch (err) {
+            bulkEditStatus.textContent = `Failed to load cards: ${err.message}`;
+            bulkEditStatus.style.color = '#e74c3c';
+        }
+    }
+
+    btnBulkCancel.addEventListener('click', () => {
+        bulkEditModal.style.display = 'none';
+        bulkEditingDeck = null;
+        bulkOriginalCards = [];
+    });
+
+    btnBulkSave.addEventListener('click', async () => {
+        if (!currentUser || !bulkEditingDeck) return;
+
+        const lines = bulkEditTextarea.value.split(/\r?\n/);
+        const parsedLines = [];
+        const errors = [];
+
+        lines.forEach((line, idx) => {
+            const trimmed = line.trim();
+            if (!trimmed) return;
+            const sepIdx = trimmed.indexOf('>');
+            if (sepIdx === -1) {
+                errors.push(`Line ${idx + 1}: Missing '>' separator`);
+                return;
+            }
+            const q = trimmed.slice(0, sepIdx).trim();
+            const a = trimmed.slice(sepIdx + 1).trim();
+            if (!q || !a) {
+                errors.push(`Line ${idx + 1}: Empty Question or Answer`);
+                return;
+            }
+            parsedLines.push({ question: q, answer: a });
+        });
+
+        if (errors.length > 0) {
+            alert(`ফরম্যাটিং ভুল পাওয়া গেছে (${errors.length}টি):\n${errors[0]}\n\nপ্রতিটি লাইন অবশ্যই 'Question > Answer' ফরম্যাটে হতে হবে।`);
+            return;
+        }
+
+        btnBulkSave.disabled = true;
+        bulkEditTextarea.disabled = true;
+        bulkEditStatus.textContent = 'Saving changes to cloud...';
+        bulkEditStatus.style.color = 'var(--msg-info-text)';
+
+        try {
+            const todayStr = getLocalDate();
+            const usedOriginalIds = new Set();
+
+            // Build lookup maps to preserve SRS stats for edited/unchanged cards
+            const byQuestion = new Map();
+            const byAnswer = new Map();
+            bulkOriginalCards.forEach(orig => {
+                if (!byQuestion.has(orig.question)) byQuestion.set(orig.question, []);
+                byQuestion.get(orig.question).push(orig);
+
+                if (!byAnswer.has(orig.answer)) byAnswer.set(orig.answer, []);
+                byAnswer.get(orig.answer).push(orig);
+            });
+
+            const matchedOriginals = new Array(parsedLines.length).fill(null);
+
+            // Pass 1: Match by exact question
+            parsedLines.forEach((item, i) => {
+                const candidates = byQuestion.get(item.question) || [];
+                const match = candidates.find(c => !usedOriginalIds.has(c.id));
+                if (match) {
+                    matchedOriginals[i] = match;
+                    usedOriginalIds.add(match.id);
+                }
+            });
+
+            // Pass 2: Match remaining by exact answer (if question text was edited)
+            parsedLines.forEach((item, i) => {
+                if (matchedOriginals[i]) return;
+                const candidates = byAnswer.get(item.answer) || [];
+                const match = candidates.find(c => !usedOriginalIds.has(c.id));
+                if (match) {
+                    matchedOriginals[i] = match;
+                    usedOriginalIds.add(match.id);
+                }
+            });
+
+            const finalRows = parsedLines.map((item, i) => {
+                const orig = matchedOriginals[i];
+                if (orig) {
+                    return cardToCloudRow({
+                        ...orig,
+                        deck_key: bulkEditingDeck.id,
+                        question: item.question,
+                        answer: item.answer
+                    });
+                } else {
+                    return cardToCloudRow({
+                        id: crypto.randomUUID(),
+                        deck_key: bulkEditingDeck.id,
+                        question: item.question,
+                        answer: item.answer,
+                        level: 0,
+                        score: 0,
+                        next_review: todayStr,
+                        pass_streak: 0,
+                        new_consecutive: 0
+                    });
+                }
+            });
+
+            // Delete cards that were removed from the text window
+            const deletedIds = bulkOriginalCards
+                .filter(orig => !usedOriginalIds.has(orig.id))
+                .map(orig => orig.id);
+
+            for (let i = 0; i < deletedIds.length; i += 200) {
+                const { error: delErr } = await supabase.from('user_flashcards')
+                    .delete()
+                    .eq('user_id', currentUser.id)
+                    .eq('deck_key', bulkEditingDeck.id)
+                    .in('id', deletedIds.slice(i, i + 200));
+                if (delErr) throw delErr;
+            }
+
+            // Upsert updated + newly added cards
+            for (let i = 0; i < finalRows.length; i += 200) {
+                const { error: upsertErr } = await supabase.from('user_flashcards')
+                    .upsert(finalRows.slice(i, i + 200), { onConflict: 'id' });
+                if (upsertErr) throw upsertErr;
+            }
+
+            bulkEditModal.style.display = 'none';
+            bulkEditingDeck = null;
+            bulkOriginalCards = [];
+            alert(`Saved successfully! Total cards: ${finalRows.length}`);
+        } catch (err) {
+            bulkEditStatus.textContent = `Save failed: ${err.message}`;
+            bulkEditStatus.style.color = '#e74c3c';
+        } finally {
+            btnBulkSave.disabled = false;
+            bulkEditTextarea.disabled = false;
+        }
+    });
+
     btnRenameCancel.onclick = () => {
         renameModal.style.display = 'none';
         deckToRename = null;
@@ -401,11 +650,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (error) throw error;
             renameModal.style.display = 'none';
             
-            // Update in selected list if present
             const inSelected = selectedDecks.find(sd => sd.id === deckToRename.id);
             if (inSelected) inSelected.name = newName;
             
-            await fetchUserDecks(); // refresh list
+            await fetchUserDecks();
         } catch(err) {
             alert(`Rename failed: ${err.message}`);
         }
@@ -481,7 +729,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const newDeckKey = `custom:${crypto.randomUUID()}`;
             
-            // CRITICAL FIX 2: Rollback Safe Creation
             const { error: e1 } = await supabase.from('user_decks').insert({
                 user_id: currentUser.id,
                 deck_key: newDeckKey,
@@ -505,7 +752,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             
             if (!insertionSuccess) {
-                // Perform rollback if partial failure
                 await supabase.from('user_flashcards').delete().eq('user_id', currentUser.id).eq('deck_key', newDeckKey);
                 await supabase.from('user_decks').delete().eq('user_id', currentUser.id).eq('deck_key', newDeckKey);
                 throw new Error("Failed to insert cards completely. Database creation rolled back.");
@@ -517,7 +763,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             createDbFeedback.textContent = `Success! "${dbName}" created with ${parsed.length} cards.`;
             createDbFeedback.style.color = '#27ae60';
             
-            await fetchUserDecks(); // Refreshes the list securely
+            await fetchUserDecks();
             
         } catch (err) {
             createDbFeedback.textContent = err.message;
@@ -528,9 +774,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // --- CRITICAL FIX 3: Safe Built-in Import ---
     async function importDeckForUserIfNeeded(deck) {
-        if (deck.file === 'personal') return; // Already authoritative in Supabase
+        if (deck.file === 'personal') return;
         
         const { data: savedDeck, error: e1 } = await supabase
             .from('user_decks')
@@ -540,7 +785,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             
         if (e1) throw e1;
         if (savedDeck) {
-            deck.file = 'personal'; // Mark as authoritative to prevent future fetches
+            deck.file = 'personal';
             return; 
         }
         
@@ -549,14 +794,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const text = await response.text();
         const { parsed } = parseCreationText(text); 
         
-        // Use upsert to handle concurrent metadata insertions gracefully
         const { error: e2 } = await supabase
             .from('user_decks')
             .upsert({ user_id: currentUser.id, deck_key: deck.id, deck_name: deck.name }, { onConflict: 'user_id,deck_key' });
         if (e2) throw e2;
         
         if (parsed.length > 0) {
-            // Prevent duplicate insertions if metadata succeeded but cards partially failed previously
             const { data: existingCards, error: e3 } = await supabase
                 .from('user_flashcards')
                 .select('question')
@@ -578,7 +821,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
         }
-        deck.file = 'personal'; // Mark as authoritative
+        deck.file = 'personal';
     }
 
     loginBtn.addEventListener('click', async () => {
@@ -653,7 +896,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // --- Core SRS Generator (Per-Database) ---
     function generateChunkForDeck(dueCards, hardWordsLimit) {
         const todayStr = getLocalDate();
         const todayDate = new Date(todayStr);
@@ -861,7 +1103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             hasUnsavedChanges = false;
             updateBoard();
             nextCard();
-            setCloudStatus('Ready! Combined session active.', 'success-message');
+            setCloudStatus(`Ready! Active session (Winning Streak: ${selectedWinningStreak}).`, 'success-message');
             
         } catch (error) {
             console.error("Chunk Build Error:", error);
@@ -869,7 +1111,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    startLearningBtn.addEventListener('click', initializeCombinedSession);
+    // Open Winning Streak Modal when Start Learning is clicked
+    startLearningBtn.addEventListener('click', () => {
+        const checkboxes = deckListContainer.querySelectorAll('input[type="checkbox"]:checked');
+        if (checkboxes.length === 0) return;
+
+        const currentVal = parseInt(streakThresholdInput?.value);
+        if (currentVal === 2 || currentVal === 3) {
+            syncStreakToggleUI(currentVal);
+        } else {
+            syncStreakToggleUI(selectedWinningStreak === 3 ? 3 : 2);
+        }
+        streakModal.style.display = 'flex';
+    });
+
+    btnStreakCancel.addEventListener('click', () => {
+        streakModal.style.display = 'none';
+    });
+
+    btnStreakConfirm.addEventListener('click', () => {
+        streakModal.style.display = 'none';
+        initializeCombinedSession();
+    });
     
     loadMoreBtn.addEventListener('click', async () => {
         loadMoreBtn.style.display = 'none';
@@ -1041,7 +1304,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const processedItem = combinedDueQueue.shift(); 
         let isNewCard = (currentItem.level === 0 && currentItem.score === 0);
         
-        const S = parseInt(document.getElementById('streak-threshold').value) || 2;
+        const S = selectedWinningStreak || parseInt(streakThresholdInput.value) || 2;
 
         if (isNewCard) {
             if (isPassed) {
@@ -1267,7 +1530,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ctx.textAlign = "left";
         ctx.textBaseline = "alphabetic";
         const deckName = selectedDecks.find(d => d.id === currentItem.deck_key)?.name || 'Unknown Deck';
-        ctx.fillText(`Mode: Q ➔ A | Deck: ${deckName}`, 20, 26);
+        ctx.fillText(`Mode: Q ➔ A | Deck: ${deckName} | Streak: ${selectedWinningStreak}`, 20, 26);
 
         const qText = currentItem.question;
         const aText = currentItem.answer;
@@ -1313,7 +1576,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // --- CRITICAL FIX 5: Export Pagination ---
     document.getElementById('export-btn').onclick = async () => {
         const btn = document.getElementById('export-btn');
         if (selectedDecks.length === 0) return;
@@ -1434,7 +1696,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.addEventListener('keydown', (event) => {
         if (playerPage.style.display !== 'block') return;
-        if (gkModal.style.display === 'flex' || renameModal.style.display === 'flex') return;
+        if (gkModal.style.display === 'flex' || renameModal.style.display === 'flex' || streakModal.style.display === 'flex' || bulkEditModal.style.display === 'flex') return;
         if (event.repeat) return;
 
         if (event.code === 'AltRight') {
